@@ -4,7 +4,7 @@ use pest_derive::Parser;
 #[derive(Debug, PartialEq)]
 pub enum ENotation {
     Boolean(bool),
-    Integer(num::BigInt),
+    Integer(i64),
     Str(String),
     Identifier(String),
     // (a b c)
@@ -21,7 +21,11 @@ fn parse_value(pair: Pair<Rule>) -> ENotation {
         Rule::boolean_false => ENotation::Boolean(false),
         Rule::list => ENotation::List(pair.into_inner().map(parse_value).collect()),
         Rule::int => ENotation::Integer(pair.as_str().parse().unwrap()),
-        Rule::COMMENT | Rule::WHITESPACE | Rule::single_line_comment | Rule::boolean => {
+        Rule::COMMENT
+        | Rule::WHITESPACE
+        | Rule::dec_int
+        | Rule::single_line_comment
+        | Rule::boolean => {
             unreachable!()
         }
         Rule::paren_list => todo!(),
@@ -50,5 +54,16 @@ fn parse_boolean() {
 #[test]
 fn parse_integer() {
     let output = parse_str("123");
-    assert_eq!(output, ENotation::Integer(num::BigInt::from(123)))
+    assert_eq!(output, ENotation::Integer(123))
+}
+
+#[test]
+fn parse_list() {
+    use ENotation::{Integer as I, List as L};
+    let output = parse_str("(1 2 3)");
+    assert_eq!(output, L(vec![I(1), I(2), I(3)]));
+
+    // test nested case
+    let output = parse_str("(1 (2 3))");
+    assert_eq!(output, L(vec![I(1), L(vec![I(2), I(3)])]));
 }
