@@ -9,15 +9,16 @@ boolean_false = @{ "#f" }
 boolean = _{ boolean_true | boolean_false }
 
 // --------- integer ------------
-int = @{ ASCII_DIGIT ~ ("_"? ~ ASCII_DIGIT)* }
+dec_int = @{ ASCII_DIGIT ~ ("_"? ~ ASCII_DIGIT)* }
+int = { ("+"|"-")? ~ dec_int }
 
 // --------- list ---------------
 paren_list = _{ "(" ~ notation* ~ ")" }
 bracket_list = _{ "[" ~ notation* ~ "]" }
-list = @{ paren_list | bracket_list}
+list = { paren_list | bracket_list}
 
 notation = _{
-    boolean
+	  boolean
   | int
   | list
 }
