@@ -1,0 +1,9 @@
+[package]
+name = "enotation"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+num = "0.4.3"
+pest = "2.7.15"
+pest_derive = "2.7.15"

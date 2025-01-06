@@ -1,0 +1,23 @@
+WHITESPACE = _{ " " | "\t" }
+
+single_line_comment = _{ ";" ~ (!NEWLINE ~ ANY)* }
+COMMENT = _{ single_line_comment }
+
+// --------- boolean ------------
+boolean_true  = @{ "#t" }
+boolean_false = @{ "#f" }
+boolean = _{ boolean_true | boolean_false }
+
+// --------- integer ------------
+int = @{ ASCII_DIGIT ~ ("_"? ~ ASCII_DIGIT)* }
+
+// --------- list ---------------
+paren_list = _{ "(" ~ notation* ~ ")" }
+bracket_list = _{ "[" ~ notation* ~ "]" }
+list = @{ paren_list | bracket_list}
+
+notation = _{
+    boolean
+  | int
+  | list
+}
