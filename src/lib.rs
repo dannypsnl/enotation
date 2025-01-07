@@ -8,27 +8,34 @@ pub enum ENotation {
     Boolean(bool),
     Integer(i64),
     Rational(i64, i64),
+    // .123 0.13 +.3 -.1
+    Float(f64),
+    // #\c #\newline #\return #\space #\tab
+    Char(char),
     Str(String),
     Identifier(String),
 
-    // TODO: float .123 0.13 +.3 -.1
-    // TODO: char #\c #\newline #\return #\space #\tab
-
     // (a b c)
     List(Vec<ENotation>),
+    // #{a b c}
     Set(Vec<ENotation>),
+    // {a 1, b 2}
     Map(Vec<(ENotation, ENotation)>),
     // '(1 c a)
     Quote(Rc<ENotation>),
     // `(1 c a)
     QuasiQuote(Rc<ENotation>),
+    // ,a
     Unquote(Rc<ENotation>),
+    // ,@(a b c)
     UnquoteSplicing(Rc<ENotation>),
     // #'(1 c a)
     Syntax(Rc<ENotation>),
     // #`(1 c a)
     QuasiSyntax(Rc<ENotation>),
+    // #,1
     Unsyntax(Rc<ENotation>),
+    // #,@(a b c)
     UnsyntaxSplicing(Rc<ENotation>),
 }
 
