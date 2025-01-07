@@ -12,6 +12,9 @@ boolean = _{ boolean_true | boolean_false }
 dec_int = @{ ASCII_DIGIT ~ ("_"? ~ ASCII_DIGIT)* }
 int = { ("+"|"-")? ~ dec_int }
 
+// --------- identifier ----------
+identifier = @{ ALPHABETIC ~ (ALPHABETIC*)? }
+
 // --------- list ---------------
 paren_list = _{ "(" ~ notation* ~ ")" }
 bracket_list = _{ "[" ~ notation* ~ "]" }
@@ -20,5 +23,6 @@ list = { paren_list | bracket_list}
 notation = _{
 	  boolean
   | int
+  | identifier
   | list
 }

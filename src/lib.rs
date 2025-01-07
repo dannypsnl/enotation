@@ -21,6 +21,7 @@ fn parse_value(pair: Pair<Rule>) -> ENotation {
         Rule::boolean_false => ENotation::Boolean(false),
         Rule::list => ENotation::List(pair.into_inner().map(parse_value).collect()),
         Rule::int => ENotation::Integer(pair.as_str().parse().unwrap()),
+        Rule::identifier => ENotation::Identifier(pair.as_str().to_string()),
         Rule::COMMENT
         | Rule::WHITESPACE
         | Rule::dec_int
@@ -66,4 +67,11 @@ fn parse_list() {
     // test nested case
     let output = parse_str("(1 (2 3))");
     assert_eq!(output, L(vec![I(1), L(vec![I(2), I(3)])]));
+}
+
+#[test]
+fn parse_identifier() {
+    use ENotation::*;
+    let output = parse_str("abc");
+    assert_eq!(output, Identifier("abc".to_string()));
 }
