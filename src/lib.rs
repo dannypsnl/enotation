@@ -96,8 +96,9 @@ impl ENotation {
             Rule::COMMENT
             | Rule::WHITESPACE
             | Rule::SCHEME_ALPHA
-            | Rule::dec_int
             | Rule::single_line_comment
+            | Rule::single_notation_comment
+            | Rule::dec_int
             | Rule::boolean
             | Rule::paren_list
             | Rule::bracket_list
@@ -209,4 +210,20 @@ fn parse_map() {
     // empty map
     let output = ENotation::from_str("{}");
     assert_eq!(output, M(vec![]));
+}
+
+#[test]
+fn parse_comment() {
+    let output = ENotationParser::parse(Rule::COMMENT, "; this is a comment")
+        .unwrap()
+        .peek();
+    assert!(output.is_none());
+
+    let output = ENotationParser::parse(Rule::COMMENT, "#;1").unwrap().peek();
+    assert!(output.is_none());
+
+    let output = ENotationParser::parse(Rule::COMMENT, "#;(1 2 3)")
+        .unwrap()
+        .peek();
+    assert!(output.is_none());
 }

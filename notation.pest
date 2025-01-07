@@ -1,7 +1,8 @@
 WHITESPACE = _{ " " | "\t" }
 
 single_line_comment = _{ ";" ~ (!NEWLINE ~ ANY)* }
-COMMENT = _{ single_line_comment }
+single_notation_comment = _{ "#;" ~ notation }
+COMMENT = _{ single_line_comment | single_notation_comment }
 
 // --------- boolean ------------
 boolean_true  = @{ "#t" }
