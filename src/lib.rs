@@ -59,6 +59,7 @@ impl ENotation {
                 let q = inner_rules.next().unwrap().as_str().parse().unwrap();
                 ENotation::Rational(p, q)
             }
+            Rule::float => ENotation::Float(pair.as_str().parse().unwrap()),
             Rule::string => ENotation::Str(remove_quotes(pair.as_str())),
             Rule::identifier => ENotation::Identifier(pair.as_str().to_string()),
 
@@ -100,9 +101,11 @@ impl ENotation {
             Rule::unsyntax_splicing => ENotation::UnsyntaxSplicing(Rc::new(ENotation::from_pair(
                 pair.into_inner().peek().unwrap(),
             ))),
+
             Rule::COMMENT
             | Rule::WHITESPACE
             | Rule::SCHEME_ALPHA
+            | Rule::SIGN
             | Rule::single_line_comment
             | Rule::single_notation_comment
             | Rule::dec_int
@@ -143,6 +146,12 @@ fn parse_integer() {
 fn parse_rational() {
     let output = ENotation::from_str("1/2");
     assert_eq!(output, ENotation::Rational(1, 2))
+}
+
+#[test]
+fn parse_float() {
+    let output = ENotation::from_str("1.23");
+    assert_eq!(output, ENotation::Float(1.23));
 }
 
 #[test]
