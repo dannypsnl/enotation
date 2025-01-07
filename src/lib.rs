@@ -65,6 +65,7 @@ fn parse_value(pair: Pair<Rule>) -> ENotation {
         }
         Rule::COMMENT
         | Rule::WHITESPACE
+        | Rule::SCHEME_ALPHA
         | Rule::dec_int
         | Rule::single_line_comment
         | Rule::boolean
@@ -121,6 +122,18 @@ fn parse_identifier() {
     use ENotation::*;
     let output = parse_str("abc");
     assert_eq!(output, Identifier("abc".to_string()));
+
+    let output = parse_str("obscure-name-!$%^&*-_=+<.>/?");
+    assert_eq!(
+        output,
+        Identifier("obscure-name-!$%^&*-_=+<.>/?".to_string())
+    );
+
+    let output = parse_str("世界");
+    assert_eq!(output, Identifier("世界".to_string()));
+
+    let output = parse_str("本好きの下剋上");
+    assert_eq!(output, Identifier("本好きの下剋上".to_string()));
 }
 
 #[test]

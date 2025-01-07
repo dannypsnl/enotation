@@ -15,7 +15,26 @@ int = { ("+"|"-")? ~ dec_int }
 rational = { int ~ "/" ~ int }
 
 // --------- identifier ----------
-identifier = @{ ALPHABETIC ~ (ALPHABETIC*)? }
+SCHEME_ALPHA = _{
+    ALPHABETIC
+  | "-"
+  | "!"
+  | "$"
+  | "%"
+  | "^"
+  | "&"
+  | "*"
+  | "-"
+  | "_"
+  | "="
+  | "+"
+  | "<"
+  | "."
+  | ">"
+  | "/"
+  | "?"
+}
+identifier = @{ ALPHABETIC ~ (SCHEME_ALPHA*)? }
 
 // --------- list ---------------
 paren_list = _{ "(" ~ notation* ~ ")" }
