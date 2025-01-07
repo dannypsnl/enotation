@@ -10,6 +10,10 @@ pub enum ENotation {
     Rational(i64, i64),
     Str(String),
     Identifier(String),
+
+    // TODO: float .123 0.13 +.3 -.1
+    // TODO: char #\c #\newline #\return #\space #\tab
+
     // (a b c)
     List(Vec<ENotation>),
     Set(Vec<ENotation>),
