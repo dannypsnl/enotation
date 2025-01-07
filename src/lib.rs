@@ -47,6 +47,18 @@ fn remove_quotes(s: &str) -> String {
     s.trim_matches(|c| c == '\"' || c == '\'').to_string()
 }
 
+fn extract_map_pair(pair: Pair<Rule>) -> (ENotation, ENotation) {
+    match pair.as_rule() {
+        Rule::map_pair => {
+            let mut inner_rules = pair.into_inner();
+            let key = inner_rules.next().unwrap();
+            let val = inner_rules.next().unwrap();
+            (ENotation::from_pair(key), ENotation::from_pair(val))
+        }
+        _ => unreachable!(),
+    }
+}
+
 impl ENotation {
     fn from_pair(pair: Pair<Rule>) -> Self {
         match pair.as_rule() {
@@ -65,17 +77,7 @@ impl ENotation {
 
             Rule::list => ENotation::List(pair.into_inner().map(ENotation::from_pair).collect()),
             Rule::set => ENotation::Set(pair.into_inner().map(ENotation::from_pair).collect()),
-            Rule::map => {
-                let mut inner_rules = pair.into_inner();
-                let mut map_pairs = vec![];
-                loop {
-                    let Some([key, val]) = inner_rules.next_chunk::<2>().ok() else {
-                        break;
-                    };
-                    map_pairs.push((ENotation::from_pair(key), ENotation::from_pair(val)));
-                }
-                ENotation::Map(map_pairs)
-            }
+            Rule::map => ENotation::Map(pair.into_inner().map(extract_map_pair).collect()),
 
             Rule::quote => ENotation::Quote(Rc::new(ENotation::from_pair(
                 pair.into_inner().peek().unwrap(),
@@ -112,7 +114,8 @@ impl ENotation {
             | Rule::boolean
             | Rule::paren_list
             | Rule::bracket_list
-            | Rule::notation => {
+            | Rule::notation
+            | Rule::map_pair => {
                 unreachable!()
             }
         }
@@ -217,7 +220,7 @@ fn parse_set() {
 #[test]
 fn parse_map() {
     use ENotation::{Identifier as Id, Integer as I, Map as M, Quote as Q};
-    let output = ENotation::from_str("{'a 2, 2 3}");
+    let output = ENotation::from_str("{'a : 2, 2 : 3}");
     assert_eq!(
         output,
         M(vec![(Q(Id("a".to_string()).into()), I(2)), (I(2), I(3))])
