@@ -30,6 +30,10 @@ pub enum ENotation {
 #[grammar = "notation.pest"]
 pub struct ENotationParser;
 
+fn remove_quotes(s: &str) -> String {
+    s.trim_matches(|c| c == '\"' || c == '\'').to_string()
+}
+
 fn parse_value(pair: Pair<Rule>) -> ENotation {
     match pair.as_rule() {
         Rule::list => ENotation::List(pair.into_inner().map(parse_value).collect()),
@@ -43,6 +47,9 @@ fn parse_value(pair: Pair<Rule>) -> ENotation {
             ENotation::Rational(p, q)
         }
         Rule::identifier => ENotation::Identifier(pair.as_str().to_string()),
+
+        Rule::string => ENotation::Str(remove_quotes(pair.as_str())),
+
         Rule::quote => ENotation::Quote(Rc::new(parse_value(pair.into_inner().peek().unwrap()))),
         Rule::quasiquote => {
             ENotation::QuasiQuote(Rc::new(parse_value(pair.into_inner().peek().unwrap())))
@@ -134,6 +141,12 @@ fn parse_identifier() {
 
     let output = parse_str("本好きの下剋上");
     assert_eq!(output, Identifier("本好きの下剋上".to_string()));
+}
+
+#[test]
+fn parse_string() {
+    let output = parse_str("\"abc\"");
+    assert_eq!(output, ENotation::Str("abc".to_string()))
 }
 
 #[test]

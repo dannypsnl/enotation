@@ -14,6 +14,9 @@ int = { ("+"|"-")? ~ dec_int }
 // --------- rational -----------
 rational = { int ~ "/" ~ int }
 
+// --------- string ----------
+string = { "\"" ~ ALPHABETIC* ~ "\"" }
+
 // --------- identifier ----------
 SCHEME_ALPHA = _{
     ALPHABETIC
@@ -58,6 +61,7 @@ notation = _{
   | int
   | identifier
   | list
+  | string
   // quoting
   | quote
   | quasiquote
