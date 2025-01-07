@@ -7,6 +7,7 @@ use pest_derive::Parser;
 pub enum ENotation {
     Boolean(bool),
     Integer(i64),
+    Rational(i64, i64),
     Str(String),
     Identifier(String),
     // (a b c)
@@ -31,10 +32,16 @@ pub struct ENotationParser;
 
 fn parse_value(pair: Pair<Rule>) -> ENotation {
     match pair.as_rule() {
+        Rule::list => ENotation::List(pair.into_inner().map(parse_value).collect()),
         Rule::boolean_true => ENotation::Boolean(true),
         Rule::boolean_false => ENotation::Boolean(false),
-        Rule::list => ENotation::List(pair.into_inner().map(parse_value).collect()),
         Rule::int => ENotation::Integer(pair.as_str().parse().unwrap()),
+        Rule::rational => {
+            let mut inner_rules = pair.into_inner();
+            let p = inner_rules.next().unwrap().as_str().parse().unwrap();
+            let q = inner_rules.next().unwrap().as_str().parse().unwrap();
+            ENotation::Rational(p, q)
+        }
         Rule::identifier => ENotation::Identifier(pair.as_str().to_string()),
         Rule::quote => ENotation::Quote(Rc::new(parse_value(pair.into_inner().peek().unwrap()))),
         Rule::quasiquote => {

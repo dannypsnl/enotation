@@ -11,6 +11,8 @@ boolean = _{ boolean_true | boolean_false }
 // --------- integer ------------
 dec_int = @{ ASCII_DIGIT ~ ("_"? ~ ASCII_DIGIT)* }
 int = { ("+"|"-")? ~ dec_int }
+// --------- rational -----------
+rational = { int ~ "/" ~ int }
 
 // --------- identifier ----------
 identifier = @{ ALPHABETIC ~ (ALPHABETIC*)? }
@@ -33,6 +35,7 @@ unsyntax_splicing = { "#,@" ~ notation }
 
 notation = _{
 	  boolean
+  | rational 
   | int
   | identifier
   | list
