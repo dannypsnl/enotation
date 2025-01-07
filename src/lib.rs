@@ -100,6 +100,12 @@ fn parse_integer() {
 }
 
 #[test]
+fn parse_rational() {
+    let output = parse_str("1/2");
+    assert_eq!(output, ENotation::Rational(1, 2))
+}
+
+#[test]
 fn parse_list() {
     use ENotation::{Integer as I, List as L};
     let output = parse_str("(1 2 3)");
