@@ -25,6 +25,7 @@ quote = { "'" ~ notation }
 quasiquote = { "`" ~ notation }
 unquote = { "," ~ notation }
 unquote_splicing = { ",@" ~ notation }
+// --------- syntax -------------
 syntax = { "#'" ~ notation }
 quasisyntax = { "#`" ~ notation }
 unsyntax = { "#," ~ notation }
@@ -35,10 +36,12 @@ notation = _{
   | int
   | identifier
   | list
+  // quoting
   | quote
   | quasiquote
   | unquote
   | unquote_splicing
+  // syntax
   | syntax
   | quasisyntax
   | unsyntax
