@@ -1,9 +1,9 @@
-use std::rc::Rc;
-
+#![feature(iter_next_chunk)]
 use pest::{iterators::Pair, Parser};
 use pest_derive::Parser;
+use std::rc::Rc;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum ENotation {
     Boolean(bool),
     Integer(i64),
@@ -12,6 +12,8 @@ pub enum ENotation {
     Identifier(String),
     // (a b c)
     List(Vec<ENotation>),
+    Set(Vec<ENotation>),
+    Map(Vec<(ENotation, ENotation)>),
     // '(1 c a)
     Quote(Rc<ENotation>),
     // `(1 c a)
@@ -37,7 +39,6 @@ fn remove_quotes(s: &str) -> String {
 impl ENotation {
     fn from_pair(pair: Pair<Rule>) -> Self {
         match pair.as_rule() {
-            Rule::list => ENotation::List(pair.into_inner().map(ENotation::from_pair).collect()),
             Rule::boolean_true => ENotation::Boolean(true),
             Rule::boolean_false => ENotation::Boolean(false),
             Rule::int => ENotation::Integer(pair.as_str().parse().unwrap()),
@@ -47,9 +48,22 @@ impl ENotation {
                 let q = inner_rules.next().unwrap().as_str().parse().unwrap();
                 ENotation::Rational(p, q)
             }
+            Rule::string => ENotation::Str(remove_quotes(pair.as_str())),
             Rule::identifier => ENotation::Identifier(pair.as_str().to_string()),
 
-            Rule::string => ENotation::Str(remove_quotes(pair.as_str())),
+            Rule::list => ENotation::List(pair.into_inner().map(ENotation::from_pair).collect()),
+            Rule::set => ENotation::Set(pair.into_inner().map(ENotation::from_pair).collect()),
+            Rule::map => {
+                let mut inner_rules = pair.into_inner();
+                let mut map_pairs = vec![];
+                loop {
+                    let Some([key, val]) = inner_rules.next_chunk::<2>().ok() else {
+                        break;
+                    };
+                    map_pairs.push((ENotation::from_pair(key), ENotation::from_pair(val)));
+                }
+                ENotation::Map(map_pairs)
+            }
 
             Rule::quote => ENotation::Quote(Rc::new(ENotation::from_pair(
                 pair.into_inner().peek().unwrap(),
@@ -166,4 +180,29 @@ fn parse_quoting() {
 
     let output = ENotation::from_str("#'(1 2 3)");
     assert_eq!(output, S(L(vec![I(1), I(2), I(3)]).into()));
+}
+
+#[test]
+fn parse_set() {
+    use ENotation::{Integer as I, Set as S};
+    let output = ENotation::from_str("#{1 2 3}");
+    assert_eq!(output, S(vec![I(1), I(2), I(3)]));
+
+    // empty set
+    let output = ENotation::from_str("#{}");
+    assert_eq!(output, S(vec![]));
+}
+
+#[test]
+fn parse_map() {
+    use ENotation::{Identifier as Id, Integer as I, Map as M, Quote as Q};
+    let output = ENotation::from_str("{'a 2, 2 3}");
+    assert_eq!(
+        output,
+        M(vec![(Q(Id("a".to_string()).into()), I(2)), (I(2), I(3))])
+    );
+
+    // empty map
+    let output = ENotation::from_str("{}");
+    assert_eq!(output, M(vec![]));
 }

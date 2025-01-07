@@ -44,6 +44,15 @@ paren_list = _{ "(" ~ notation* ~ ")" }
 bracket_list = _{ "[" ~ notation* ~ "]" }
 list = { paren_list | bracket_list}
 
+// --------- set ----------------
+set = { "#{" ~ notation* ~ "}" }
+
+// --------- map ----------------
+map = {
+    "{" ~ "}"
+  | "{" ~ (notation ~ notation) ~ ("," ~ notation ~ notation)* ~ "}"
+}
+
 // --------- quote --------------
 quote = { "'" ~ notation }
 quasiquote = { "`" ~ notation }
@@ -59,9 +68,11 @@ notation = _{
 	  boolean
   | rational 
   | int
+  | string
   | identifier
   | list
-  | string
+  | set
+  | map
   // quoting
   | quote
   | quasiquote
