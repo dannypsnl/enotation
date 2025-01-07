@@ -9,6 +9,20 @@ boolean_true  = @{ "#t" }
 boolean_false = @{ "#f" }
 boolean = _{ boolean_true | boolean_false }
 
+// --------- char ---------------
+regular_char = @{ "#\\" ~ ANY }
+char_newline = @{ "#\\newline" }
+char_return = @{ "#\\return" }
+char_space = @{ "#\\space" }
+char_tab = @{ "#\\tab" }
+char = _{
+  char_newline |
+  char_return |
+  char_space |
+  char_tab |
+  regular_char
+}
+
 // --------- integer ------------
 SIGN = { "+"|"-" }
 dec_int = @{ ASCII_DIGIT ~ ("_"? ~ ASCII_DIGIT)* }
@@ -74,6 +88,7 @@ unsyntax_splicing = { "#,@" ~ notation }
 
 notation = _{
     boolean
+  | char
   | float
   | rational
   | int

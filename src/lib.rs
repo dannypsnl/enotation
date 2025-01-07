@@ -64,6 +64,13 @@ impl ENotation {
         match pair.as_rule() {
             Rule::boolean_true => ENotation::Boolean(true),
             Rule::boolean_false => ENotation::Boolean(false),
+
+            Rule::regular_char => ENotation::Char(pair.as_str().chars().nth(2).unwrap()),
+            Rule::char_newline => ENotation::Char('\n'),
+            Rule::char_return => ENotation::Char('\r'),
+            Rule::char_space => ENotation::Char(' '),
+            Rule::char_tab => ENotation::Char('\t'),
+
             Rule::int => ENotation::Integer(pair.as_str().parse().unwrap()),
             Rule::rational => {
                 let mut inner_rules = pair.into_inner();
@@ -111,6 +118,7 @@ impl ENotation {
             | Rule::single_line_comment
             | Rule::single_notation_comment
             | Rule::dec_int
+            | Rule::char
             | Rule::boolean
             | Rule::paren_list
             | Rule::bracket_list
@@ -166,6 +174,19 @@ fn parse_list() {
     // test nested case
     let output = ENotation::from_str("(1 (2 3))");
     assert_eq!(output, L(vec![I(1), L(vec![I(2), I(3)])]));
+}
+
+#[test]
+fn parse_char() {
+    use ENotation::Char as C;
+    let output = ENotation::from_str("#\\c");
+    assert_eq!(output, C('c'));
+
+    let output = ENotation::from_str("#\\tab");
+    assert_eq!(output, C('\t'));
+
+    let output = ENotation::from_str("#\\/");
+    assert_eq!(output, C('/'));
 }
 
 #[test]
