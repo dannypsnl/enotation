@@ -20,9 +20,27 @@ paren_list = _{ "(" ~ notation* ~ ")" }
 bracket_list = _{ "[" ~ notation* ~ "]" }
 list = { paren_list | bracket_list}
 
+// --------- quote --------------
+quote = { "'" ~ notation }
+quasiquote = { "`" ~ notation }
+unquote = { "," ~ notation }
+unquote_splicing = { ",@" ~ notation }
+syntax = { "#'" ~ notation }
+quasisyntax = { "#`" ~ notation }
+unsyntax = { "#," ~ notation }
+unsyntax_splicing = { "#,@" ~ notation }
+
 notation = _{
 	  boolean
   | int
   | identifier
   | list
+  | quote
+  | quasiquote
+  | unquote
+  | unquote_splicing
+  | syntax
+  | quasisyntax
+  | unsyntax
+  | unsyntax_splicing
 }
