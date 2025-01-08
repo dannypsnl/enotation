@@ -20,7 +20,7 @@ pub enum ENotation {
     // #{a b c}
     Set(Vec<ENotation>),
     // {a 1, b 2}
-    Map(Vec<(ENotation, ENotation)>),
+    Object(Vec<(String, ENotation)>),
     // '(1 c a)
     Quote(Rc<ENotation>),
     // `(1 c a)
@@ -47,13 +47,13 @@ fn remove_quotes(s: &str) -> String {
     s.trim_matches(|c| c == '\"' || c == '\'').to_string()
 }
 
-fn extract_map_pair(pair: Pair<Rule>) -> (ENotation, ENotation) {
+fn extract_object_pair(pair: Pair<Rule>) -> (String, ENotation) {
     match pair.as_rule() {
-        Rule::map_pair => {
+        Rule::object_pair => {
             let mut inner_rules = pair.into_inner();
             let key = inner_rules.next().unwrap();
             let val = inner_rules.next().unwrap();
-            (ENotation::from_pair(key), ENotation::from_pair(val))
+            (key.as_str().to_string(), ENotation::from_pair(val))
         }
         _ => unreachable!(),
     }
@@ -84,7 +84,7 @@ impl ENotation {
 
             Rule::list => ENotation::List(pair.into_inner().map(ENotation::from_pair).collect()),
             Rule::set => ENotation::Set(pair.into_inner().map(ENotation::from_pair).collect()),
-            Rule::map => ENotation::Map(pair.into_inner().map(extract_map_pair).collect()),
+            Rule::object => ENotation::Object(pair.into_inner().map(extract_object_pair).collect()),
 
             Rule::quote => ENotation::Quote(Rc::new(ENotation::from_pair(
                 pair.into_inner().peek().unwrap(),
@@ -123,7 +123,7 @@ impl ENotation {
             | Rule::paren_list
             | Rule::bracket_list
             | Rule::notation
-            | Rule::map_pair => {
+            | Rule::object_pair => {
                 unreachable!()
             }
         }
@@ -240,16 +240,16 @@ fn parse_set() {
 
 #[test]
 fn parse_map() {
-    use ENotation::{Identifier as Id, Integer as I, Map as M, Quote as Q};
-    let output = ENotation::from_str("{'a : 2, 2 : 3}");
+    use ENotation::{Integer as I, Object as O};
+    let output = ENotation::from_str("{a: 2, b: 3}");
     assert_eq!(
         output,
-        M(vec![(Q(Id("a".to_string()).into()), I(2)), (I(2), I(3))])
+        O(vec![("a".to_string(), I(2)), ("b".to_string(), I(3))])
     );
 
     // empty map
     let output = ENotation::from_str("{}");
-    assert_eq!(output, M(vec![]));
+    assert_eq!(output, O(vec![]));
 }
 
 #[test]

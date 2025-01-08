@@ -68,12 +68,12 @@ list = { paren_list | bracket_list }
 // --------- set ----------------
 set = { "#{" ~ notation* ~ "}" }
 
-// --------- map ----------------
-map = {
+// --------- object -------------
+object = {
     "{" ~ "}"
-  | "{" ~ map_pair ~ ("," ~ map_pair)* ~ "}"
+  | "{" ~ object_pair ~ ("," ~ object_pair)* ~ "}"
 }
-map_pair = { notation ~ ":" ~ notation }
+object_pair = { identifier ~ ":" ~ notation }
 
 // --------- quote --------------
 quote = { "'" ~ notation }
@@ -96,7 +96,7 @@ notation = _{
   | identifier
   | list
   | set
-  | map
+  | object
   // quoting
   | quote
   | quasiquote
