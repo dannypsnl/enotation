@@ -25,12 +25,12 @@ char = _{
 
 // --------- integer ------------
 SIGN = { "+"|"-" }
-dec_int = @{ ASCII_DIGIT ~ ("_"? ~ ASCII_DIGIT)* }
-int = { SIGN? ~ dec_int }
+dec_int = { ASCII_DIGIT ~ ("_"? ~ ASCII_DIGIT)* }
+int = @{ SIGN? ~ dec_int }
 // --------- rational -----------
 rational = { int ~ "/" ~ int }
 // --------- float ---------------
-float = {
+float = @{
     int ~ "." ~ dec_int
   | SIGN? ~ "." ~ dec_int
 }

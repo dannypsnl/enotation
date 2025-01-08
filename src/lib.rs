@@ -184,6 +184,8 @@ impl ENotation {
                 | Rule::WHITESPACE
                 | Rule::SCHEME_ALPHA
                 | Rule::SIGN
+                | Rule::EOI
+                | Rule::file
                 | Rule::single_line_comment
                 | Rule::single_notation_comment
                 | Rule::dec_int
