@@ -19,7 +19,7 @@ pub enum ENotation {
     List(Vec<ENotation>),
     // #{a b c}
     Set(Vec<ENotation>),
-    // {a 1, b 2}
+    // {a: 1, b: 2}
     Object(Vec<(String, ENotation)>),
     // '(1 c a)
     Quote(Rc<ENotation>),
@@ -47,7 +47,7 @@ fn remove_quotes(s: &str) -> String {
     s.trim_matches(|c| c == '\"' || c == '\'').to_string()
 }
 
-fn extract_object_pair(pair: Pair<Rule>) -> (String, ENotation) {
+fn extract_object_pair((index, pair): (usize, Pair<Rule>)) -> (String, ENotation) {
     match pair.as_rule() {
         Rule::object_pair => {
             let mut inner_rules = pair.into_inner();
@@ -55,7 +55,7 @@ fn extract_object_pair(pair: Pair<Rule>) -> (String, ENotation) {
             let val = inner_rules.next().unwrap();
             (key.as_str().to_string(), ENotation::from_pair(val))
         }
-        _ => unreachable!(),
+        _ => (index.to_string(), ENotation::from_pair(pair)),
     }
 }
 
@@ -84,7 +84,12 @@ impl ENotation {
 
             Rule::list => ENotation::List(pair.into_inner().map(ENotation::from_pair).collect()),
             Rule::set => ENotation::Set(pair.into_inner().map(ENotation::from_pair).collect()),
-            Rule::object => ENotation::Object(pair.into_inner().map(extract_object_pair).collect()),
+            Rule::object => ENotation::Object(
+                pair.into_inner()
+                    .enumerate()
+                    .map(extract_object_pair)
+                    .collect(),
+            ),
 
             Rule::quote => ENotation::Quote(Rc::new(ENotation::from_pair(
                 pair.into_inner().peek().unwrap(),
@@ -239,7 +244,7 @@ fn parse_set() {
 }
 
 #[test]
-fn parse_map() {
+fn parse_object() {
     use ENotation::{Integer as I, Object as O};
     let output = ENotation::from_str("{a: 2, b: 3}");
     assert_eq!(
@@ -247,7 +252,18 @@ fn parse_map() {
         O(vec![("a".to_string(), I(2)), ("b".to_string(), I(3))])
     );
 
-    // empty map
+    // unnamed object
+    let output = ENotation::from_str("{1, 2, 3}");
+    assert_eq!(
+        output,
+        O(vec![
+            ("0".to_string(), I(1)),
+            ("1".to_string(), I(2)),
+            ("2".to_string(), I(3))
+        ])
+    );
+
+    // empty object
     let output = ENotation::from_str("{}");
     assert_eq!(output, O(vec![]));
 }

@@ -70,10 +70,13 @@ set = { "#{" ~ notation* ~ "}" }
 
 // --------- object -------------
 object = {
-    "{" ~ "}"
-  | "{" ~ object_pair ~ ("," ~ object_pair)* ~ "}"
+  "{" ~ "}" |
+  "{" ~ object_pair ~ ("," ~ object_pair)* ~ ","? ~ "}" |
+  "{" ~ notation ~ ("," ~ notation)* ~ ","? ~ "}"
 }
-object_pair = { identifier ~ ":" ~ notation }
+object_pair = {
+  identifier ~ ":" ~ notation
+}
 
 // --------- quote --------------
 quote = { "'" ~ notation }
