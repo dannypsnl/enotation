@@ -1,4 +1,4 @@
-WHITESPACE = _{ " " | "\t" }
+WHITESPACE = _{ " " | "\t" | "\n" }
 
 single_line_comment = _{ ";" ~ (!NEWLINE ~ ANY)* }
 single_notation_comment = _{ "#;" ~ notation }
@@ -110,4 +110,8 @@ notation = _{
   | quasisyntax
   | unsyntax
   | unsyntax_splicing
+}
+
+file = {
+  SOI ~ notation* ~ EOI
 }
