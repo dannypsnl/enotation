@@ -2,6 +2,11 @@
 name = "enotation"
 version = "0.1.0"
 edition = "2021"
+license-file = "LICENSE"
+description = "Extended s-notation"
+homepage = "https://github.com/dannypsnl/enotation"
+repository = "https://github.com/dannypsnl/enotation"
+readme = "README.md"
 
 [dependencies]
 ariadne = { version = "0.5.0", features = ["concolor"] }
