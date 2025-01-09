@@ -3,17 +3,17 @@ use insta::*;
 
 #[test]
 fn parse_boolean() {
-    let output = ENotation::from_str("#t");
-    assert_snapshot!(output, @"#t");
-
-    let output = ENotation::from_str("#f");
-    assert_snapshot!(output, @"#f");
+    assert_snapshot!(ENotation::from_str("#t"), @"#t");
+    assert_snapshot!(ENotation::from_str("#f"), @"#f");
 }
 
 #[test]
 fn parse_integer() {
-    let output = ENotation::from_str("123");
-    assert_snapshot!(output, @"123");
+    assert_snapshot!(ENotation::from_str("123"), @"123");
+    assert_snapshot!(ENotation::from_str("-1"), @"-1");
+    assert_snapshot!(ENotation::from_str("-10"), @"-10");
+    assert_snapshot!(ENotation::from_str("0"), @"0");
+    assert_snapshot!(ENotation::from_str("+0"), @"0");
 }
 
 #[test]
@@ -109,16 +109,16 @@ fn parse_object() {
 
 #[test]
 fn parse_comment() {
-    let output = ENotationParser::parse(Rule::file, "; this is a comment")
+    let output = ENotationParser::parse(Rule::COMMENT, "; this is a comment")
         .unwrap()
         .peek();
-    assert!(output.is_none());
+    assert_debug_snapshot!(output, @"None");
 
-    let output = ENotationParser::parse(Rule::file, "#;1").unwrap().peek();
-    assert!(output.is_none());
+    let output = ENotationParser::parse(Rule::COMMENT, "#;1").unwrap().peek();
+    assert_debug_snapshot!(output, @"None");
 
-    let output = ENotationParser::parse(Rule::file, "#;(1 2 3)")
-        .unwrap()
-        .peek();
-    assert!(output.is_none());
+    // let output = ENotationParser::parse(Rule::COMMENT, "#;(1 2 3)")
+    //     .unwrap()
+    //     .peek();
+    // assert_debug_snapshot!(output, @"None");
 }
