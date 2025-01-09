@@ -19,93 +19,66 @@ fn parse_integer() {
 
 #[test]
 fn parse_rational() {
-    let output = ENotation::from_str("1/2");
-    assert_snapshot!(output, @"1/2");
+    assert_snapshot!(ENotation::from_str("1/2"), @"1/2");
 }
 
 #[test]
 fn parse_float() {
-    let output = ENotation::from_str("1.23");
-    assert_snapshot!(output, @"1.23");
+    assert_snapshot!(ENotation::from_str("1.23"), @"1.23");
 }
 
 #[test]
 fn parse_list() {
-    let output = ENotation::from_str("(1 2 3)");
-    assert_snapshot!(output, @"(1 2 3)");
-
+    assert_snapshot!(ENotation::from_str("(1 2 3)"), @"(1 2 3)");
     // test nested case
-    let output = ENotation::from_str("(1 (2 3))");
-    assert_snapshot!(output, @"(1 (2 3))");
+    assert_snapshot!(ENotation::from_str("(1 (2 3))"), @"(1 (2 3))");
 }
 
 #[test]
 fn parse_char() {
-    let output = ENotation::from_str("#\\c");
-    assert_snapshot!(output, @"#\\c");
-
-    let output = ENotation::from_str("#\\tab");
-    assert_snapshot!(output, @"#\\tab");
-
-    let output = ENotation::from_str("#\\/");
-    assert_snapshot!(output, @"#\\/");
+    assert_snapshot!(ENotation::from_str("#\\c"), @"#\\c");
+    assert_snapshot!(ENotation::from_str("#\\tab"), @"#\\tab");
+    assert_snapshot!(ENotation::from_str("#\\/"), @"#\\/");
 }
 
 #[test]
 fn parse_identifier() {
-    let output = ENotation::from_str("abc");
-    assert_snapshot!(output, @"abc");
-
-    let output = ENotation::from_str("obscure-name-!$%^&*-_=+<.>/?");
-    assert_snapshot!(output, @"obscure-name-!$%^&*-_=+<.>/?");
-
-    let output = ENotation::from_str("世界");
-    assert_snapshot!(output, @"世界");
-
-    let output = ENotation::from_str("本好きの下剋上");
-    assert_snapshot!(output, @"本好きの下剋上");
+    assert_snapshot!(ENotation::from_str("abc"), @"abc");
+    assert_snapshot!(ENotation::from_str("obscure-name-!$%^&*-_=+<.>/?"), @"obscure-name-!$%^&*-_=+<.>/?");
+    assert_snapshot!(ENotation::from_str("世界"), @"世界");
+    assert_snapshot!(ENotation::from_str("本好きの下剋上"), @"本好きの下剋上");
 }
 
 #[test]
 fn parse_string() {
-    let output = ENotation::from_str("\"abc\"");
-    assert_snapshot!(output, @"\"abc\"");
+    assert_snapshot!(ENotation::from_str("\"abc\""), @"\"abc\"");
 }
 
 #[test]
 fn parse_quoting() {
-    let output = ENotation::from_str("'(1 2 3)");
-    assert_snapshot!(output, @"'(1 2 3)");
-
-    let output = ENotation::from_str("`(1 2 3)");
-    assert_snapshot!(output, @"`(1 2 3)");
-
-    let output = ENotation::from_str("#'(1 2 3)");
-    assert_snapshot!(output, @"#'(1 2 3)");
+    // quote
+    assert_snapshot!(ENotation::from_str("'(1 2 3)"), @"'(1 2 3)");
+    // quasiquote
+    assert_snapshot!(ENotation::from_str("`(1 2 3)"), @"`(1 2 3)");
+    // syntax
+    assert_snapshot!(ENotation::from_str("#'(1 2 3)"), @"#'(1 2 3)");
 }
 
 #[test]
 fn parse_set() {
-    let output = ENotation::from_str("#{1 2 3}");
-    assert_snapshot!(output, @"#{1 2 3}");
-
+    // set
+    assert_snapshot!(ENotation::from_str("#{1 2 3}"), @"#{1 2 3}");
     // empty set
-    let output = ENotation::from_str("#{}");
-    assert_snapshot!(output, @"#{}");
+    assert_snapshot!(ENotation::from_str("#{}"), @"#{}");
 }
 
 #[test]
 fn parse_object() {
-    let output = ENotation::from_str("{a: 2, b: 3}");
-    assert_snapshot!(output, @"{a: 2, b: 3}");
-
+    assert_snapshot!(ENotation::from_str("{a: 2, b: 3}"), @"{a: 2, b: 3}");
     // unnamed object
-    let output = ENotation::from_str("{1, 2, 3}");
-    assert_snapshot!(output, @"{1, 2, 3}");
-
+    assert_snapshot!(ENotation::from_str("{1, 2, 3}"), @"{1, 2, 3}");
     // empty object
-    let output = ENotation::from_str("{}");
-    assert_snapshot!(output, @"{}");
+    assert_snapshot!(ENotation::from_str("{}"), @"{}");
 }
 
 #[test]
