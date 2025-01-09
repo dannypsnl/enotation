@@ -14,6 +14,7 @@ fn parse_integer() {
     assert_snapshot!(ENotation::from_str("-10"), @"-10");
     assert_snapshot!(ENotation::from_str("0"), @"0");
     assert_snapshot!(ENotation::from_str("+0"), @"0");
+    assert_snapshot!(ENotation::from_str("-0"), @"0");
 }
 
 #[test]

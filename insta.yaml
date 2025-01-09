@@ -1,4 +1,6 @@
 behavior:
   update: unseen
-  test.auto_review: true
-  test.auto_accept_unseen: true
+
+test:
+  auto_review: true
+  auto_accept_unseen: true
