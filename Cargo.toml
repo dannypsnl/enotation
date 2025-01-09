@@ -14,3 +14,6 @@ num = "0.4.3"
 pest = "2.7.15"
 pest_derive = "2.7.15"
 serde = "1.0.217"
+
+[dev-dependencies]
+insta = { version = "1.42.0", features = ["yaml"] }

@@ -1,1 +1,3 @@
 /target
+src/snapshots/
+src/.tests.rs.pending-snap

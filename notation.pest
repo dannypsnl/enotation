@@ -71,7 +71,10 @@ set = { "#{" ~ notation* ~ "}" }
 // --------- object -------------
 object = {
   "{" ~ "}" |
-  "{" ~ object_pair ~ ("," ~ object_pair)* ~ ","? ~ "}" |
+  "{" ~ object_pair ~ ("," ~ object_pair)* ~ ","? ~ "}"
+}
+unamed_object = {
+  "{" ~ "}" |
   "{" ~ notation ~ ("," ~ notation)* ~ ","? ~ "}"
 }
 object_pair = {
@@ -99,6 +102,7 @@ notation = _{
   | identifier
   | list
   | set
+  | unamed_object
   | object
   // quoting
   | quote
