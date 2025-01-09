@@ -109,15 +109,15 @@ fn parse_object() {
 
 #[test]
 fn parse_comment() {
-    let output = ENotationParser::parse(Rule::COMMENT, "; this is a comment")
+    let output = ENotationParser::parse(Rule::file, "; this is a comment")
         .unwrap()
         .peek();
     assert!(output.is_none());
 
-    let output = ENotationParser::parse(Rule::COMMENT, "#;1").unwrap().peek();
+    let output = ENotationParser::parse(Rule::file, "#;1").unwrap().peek();
     assert!(output.is_none());
 
-    let output = ENotationParser::parse(Rule::COMMENT, "#;(1 2 3)")
+    let output = ENotationParser::parse(Rule::file, "#;(1 2 3)")
         .unwrap()
         .peek();
     assert!(output.is_none());
