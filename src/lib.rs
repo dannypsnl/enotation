@@ -1,10 +1,52 @@
 #![feature(iter_next_chunk)]
 use pest::{iterators::Pair, Parser};
 use pest_derive::Parser;
-use std::{fmt::Display, rc::Rc};
+use std::{fmt::Display, fs::File, io::Read, path::Path, rc::Rc};
 
 #[cfg(test)]
 mod tests;
+
+#[derive(Debug)]
+pub enum ReadError {
+    Io(std::io::Error),
+    Pest(pest::error::Error<Rule>),
+}
+impl From<pest::error::Error<Rule>> for ReadError {
+    fn from(err: pest::error::Error<Rule>) -> Self {
+        ReadError::Pest(err)
+    }
+}
+impl From<std::io::Error> for ReadError {
+    fn from(err: std::io::Error) -> Self {
+        ReadError::Io(err)
+    }
+}
+
+pub fn parse_path(path: &Path) -> Result<Vec<ENotation>, ReadError> {
+    parse_file(File::open(path)?)
+}
+pub fn parse_file(mut file: File) -> Result<Vec<ENotation>, ReadError> {
+    let mut string = String::new();
+    file.read_to_string(&mut string)?;
+    parse_str(string.as_str())
+}
+pub fn parse_str(input: &str) -> Result<Vec<ENotation>, ReadError> {
+    let pairs = ENotationParser::parse(Rule::file, input)?;
+    Ok(pairs
+        .peek()
+        .unwrap()
+        .into_inner()
+        .filter(|p| match p.as_rule() {
+            Rule::COMMENT
+            | Rule::WHITESPACE
+            | Rule::EOI
+            | Rule::single_line_comment
+            | Rule::single_notation_comment => false,
+            _ => true,
+        })
+        .map(|p| ENotation::from_pair(p))
+        .collect::<Vec<_>>())
+}
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct DiagnosticSpan {
@@ -89,109 +131,10 @@ pub enum ENotationBody {
     // #,@(a b c)
     UnsyntaxSplicing(Rc<ENotation>),
 }
-
-impl Display for ENotationBody {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            ENotationBody::Boolean(true) => write!(f, "#t"),
-            ENotationBody::Boolean(false) => write!(f, "#f"),
-            ENotationBody::Integer(i) => write!(f, "{}", i),
-            ENotationBody::Rational(p, q) => write!(f, "{}/{}", p, q),
-            ENotationBody::Float(a) => write!(f, "{}", a),
-            ENotationBody::Char('\n') => write!(f, "#\\newline"),
-            ENotationBody::Char('\r') => write!(f, "#\\return"),
-            ENotationBody::Char(' ') => write!(f, "#\\space"),
-            ENotationBody::Char('\t') => write!(f, "#\\tab"),
-            ENotationBody::Char(c) => write!(f, "#\\{}", c),
-            ENotationBody::Str(s) => write!(f, "\"{}\"", s),
-            ENotationBody::Identifier(x) => write!(f, "{}", x),
-            ENotationBody::List(vec) => {
-                write!(f, "(")?;
-                for (i, x) in vec.iter().enumerate() {
-                    if i == 0 {
-                        write!(f, "{}", x)?;
-                    } else {
-                        write!(f, " {}", x)?;
-                    }
-                }
-                write!(f, ")")
-            }
-            ENotationBody::Set(vec) => {
-                write!(f, "#{{")?;
-                for (i, x) in vec.iter().enumerate() {
-                    if i == 0 {
-                        write!(f, "{}", x)?;
-                    } else {
-                        write!(f, " {}", x)?;
-                    }
-                }
-                write!(f, "}}")
-            }
-
-            ENotationBody::UnamedObject(vec) => {
-                write!(f, "{{")?;
-                for (i, x) in vec.iter().enumerate() {
-                    if i == 0 {
-                        write!(f, "{}", x)?;
-                    } else {
-                        write!(f, ", {}", x)?;
-                    }
-                }
-                write!(f, "}}")
-            }
-            ENotationBody::Object(vec) => {
-                write!(f, "{{")?;
-                for (i, (key, value)) in vec.iter().enumerate() {
-                    if i == 0 {
-                        write!(f, "{}: {}", key, value)?;
-                    } else {
-                        write!(f, ", {}: {}", key, value)?;
-                    }
-                }
-                write!(f, "}}")
-            }
-            ENotationBody::Quote(enotation) => write!(f, "'{}", enotation),
-            ENotationBody::QuasiQuote(enotation) => {
-                write!(f, "`{}", enotation)
-            }
-            ENotationBody::Unquote(enotation) => {
-                write!(f, ",{}", enotation)
-            }
-            ENotationBody::UnquoteSplicing(enotation) => {
-                write!(f, ",@{}", enotation)
-            }
-            ENotationBody::Syntax(enotation) => {
-                write!(f, "#'{}", enotation)
-            }
-            ENotationBody::QuasiSyntax(enotation) => {
-                write!(f, "#`{}", enotation)
-            }
-            ENotationBody::Unsyntax(enotation) => {
-                write!(f, "#,{}", enotation)
-            }
-            ENotationBody::UnsyntaxSplicing(enotation) => {
-                write!(f, "#,@{}", enotation)
-            }
-        }
-    }
-}
-
 #[derive(Debug, Clone)]
 pub struct ENotation {
     pub span: DiagnosticSpan,
     pub body: ENotationBody,
-}
-
-impl PartialEq for ENotation {
-    fn eq(&self, other: &Self) -> bool {
-        self.body == other.body
-    }
-}
-
-impl Display for ENotation {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.body.fmt(f)
-    }
 }
 
 #[derive(Parser)]
@@ -297,5 +240,103 @@ impl ENotation {
             .next()
             .unwrap();
         Self::from_pair(output)
+    }
+}
+
+impl Display for ENotationBody {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ENotationBody::Boolean(true) => write!(f, "#t"),
+            ENotationBody::Boolean(false) => write!(f, "#f"),
+            ENotationBody::Integer(i) => write!(f, "{}", i),
+            ENotationBody::Rational(p, q) => write!(f, "{}/{}", p, q),
+            ENotationBody::Float(a) => write!(f, "{}", a),
+            ENotationBody::Char('\n') => write!(f, "#\\newline"),
+            ENotationBody::Char('\r') => write!(f, "#\\return"),
+            ENotationBody::Char(' ') => write!(f, "#\\space"),
+            ENotationBody::Char('\t') => write!(f, "#\\tab"),
+            ENotationBody::Char(c) => write!(f, "#\\{}", c),
+            ENotationBody::Str(s) => write!(f, "\"{}\"", s),
+            ENotationBody::Identifier(x) => write!(f, "{}", x),
+            ENotationBody::List(vec) => {
+                write!(f, "(")?;
+                for (i, x) in vec.iter().enumerate() {
+                    if i == 0 {
+                        write!(f, "{}", x)?;
+                    } else {
+                        write!(f, " {}", x)?;
+                    }
+                }
+                write!(f, ")")
+            }
+            ENotationBody::Set(vec) => {
+                write!(f, "#{{")?;
+                for (i, x) in vec.iter().enumerate() {
+                    if i == 0 {
+                        write!(f, "{}", x)?;
+                    } else {
+                        write!(f, " {}", x)?;
+                    }
+                }
+                write!(f, "}}")
+            }
+
+            ENotationBody::UnamedObject(vec) => {
+                write!(f, "{{")?;
+                for (i, x) in vec.iter().enumerate() {
+                    if i == 0 {
+                        write!(f, "{}", x)?;
+                    } else {
+                        write!(f, ", {}", x)?;
+                    }
+                }
+                write!(f, "}}")
+            }
+            ENotationBody::Object(vec) => {
+                write!(f, "{{")?;
+                for (i, (key, value)) in vec.iter().enumerate() {
+                    if i == 0 {
+                        write!(f, "{}: {}", key, value)?;
+                    } else {
+                        write!(f, ", {}: {}", key, value)?;
+                    }
+                }
+                write!(f, "}}")
+            }
+            ENotationBody::Quote(enotation) => write!(f, "'{}", enotation),
+            ENotationBody::QuasiQuote(enotation) => {
+                write!(f, "`{}", enotation)
+            }
+            ENotationBody::Unquote(enotation) => {
+                write!(f, ",{}", enotation)
+            }
+            ENotationBody::UnquoteSplicing(enotation) => {
+                write!(f, ",@{}", enotation)
+            }
+            ENotationBody::Syntax(enotation) => {
+                write!(f, "#'{}", enotation)
+            }
+            ENotationBody::QuasiSyntax(enotation) => {
+                write!(f, "#`{}", enotation)
+            }
+            ENotationBody::Unsyntax(enotation) => {
+                write!(f, "#,{}", enotation)
+            }
+            ENotationBody::UnsyntaxSplicing(enotation) => {
+                write!(f, "#,@{}", enotation)
+            }
+        }
+    }
+}
+
+impl PartialEq for ENotation {
+    fn eq(&self, other: &Self) -> bool {
+        self.body == other.body
+    }
+}
+
+impl Display for ENotation {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.body.fmt(f)
     }
 }
