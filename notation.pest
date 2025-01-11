@@ -26,7 +26,7 @@ SIGN = @{ "+"|"-" }
 dec_int = @{ ASCII_DIGIT ~ ("_"? ~ ASCII_DIGIT)* }
 int = @{ SIGN? ~ dec_int }
 // --------- rational -----------
-rational = @{ int ~ "/" ~ int }
+rational = @{ int ~ "/" ~ dec_int }
 // --------- float ---------------
 float = @{
     int ~ "." ~ dec_int

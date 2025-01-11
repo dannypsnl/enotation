@@ -93,8 +93,10 @@ pub struct Integer {
 #[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::rational))]
 pub struct Rational {
-    pub numerator: Integer,
-    pub denominator: Integer,
+    #[pest_ast(outer(with(span_into_str), with(str::parse), with(Result::unwrap)))]
+    pub numerator: i64,
+    #[pest_ast(outer(with(span_into_str), with(str::parse), with(Result::unwrap)))]
+    pub denominator: i64,
 }
 
 #[derive(Debug, FromPest)]

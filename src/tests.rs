@@ -8,6 +8,30 @@ impl ENotation {
         let mut output = ENotationParser::parse(Rule::notation, input).unwrap();
         Boolean::from_pest(&mut output).unwrap()
     }
+    fn integer(input: &str) -> Integer {
+        let mut output = ENotationParser::parse(Rule::notation, input).unwrap();
+        Integer::from_pest(&mut output).unwrap()
+    }
+    fn rational(input: &str) -> Rational {
+        let mut output = ENotationParser::parse(Rule::notation, input).unwrap();
+        Rational::from_pest(&mut output).unwrap()
+    }
+    fn float(input: &str) -> Float {
+        let mut output = ENotationParser::parse(Rule::notation, input).unwrap();
+        Float::from_pest(&mut output).unwrap()
+    }
+    fn char(input: &str) -> Char {
+        let mut output = ENotationParser::parse(Rule::notation, input).unwrap();
+        Char::from_pest(&mut output).unwrap()
+    }
+    fn identifier(input: &str) -> Identifier {
+        let mut output = ENotationParser::parse(Rule::notation, input).unwrap();
+        Identifier::from_pest(&mut output).unwrap()
+    }
+    fn string(input: &str) -> String_ {
+        let mut output = ENotationParser::parse(Rule::notation, input).unwrap();
+        String_::from_pest(&mut output).unwrap()
+    }
 }
 
 #[test]
@@ -16,51 +40,51 @@ fn parse_boolean() {
     assert_snapshot!(ENotation::boolean("#f"), @"#f");
 }
 
-// #[test]
-// fn parse_integer() {
-//     assert_snapshot!(ENotation::from_str("123"), @"123");
-//     assert_snapshot!(ENotation::from_str("-1"), @"-1");
-//     assert_snapshot!(ENotation::from_str("-10"), @"-10");
-//     assert_snapshot!(ENotation::from_str("0"), @"0");
-//     assert_snapshot!(ENotation::from_str("+0"), @"0");
-//     assert_snapshot!(ENotation::from_str("-0"), @"0");
-// }
+#[test]
+fn parse_integer() {
+    assert_snapshot!(ENotation::integer("123"), @"123");
+    assert_snapshot!(ENotation::integer("-1"), @"-1");
+    assert_snapshot!(ENotation::integer("-10"), @"-10");
+    assert_snapshot!(ENotation::integer("0"), @"0");
+    assert_snapshot!(ENotation::integer("+0"), @"0");
+    assert_snapshot!(ENotation::integer("-0"), @"0");
+}
 
-// #[test]
-// fn parse_rational() {
-//     assert_snapshot!(ENotation::from_str("1/2"), @"1/2");
-// }
+#[test]
+fn parse_rational() {
+    assert_snapshot!(ENotation::rational("1/2"), @"1/2");
+}
 
-// #[test]
-// fn parse_float() {
-//     assert_snapshot!(ENotation::from_str("1.23"), @"1.23");
-// }
+#[test]
+fn parse_float() {
+    assert_snapshot!(ENotation::float("1.23"), @"1.23");
+}
+
+#[test]
+fn parse_char() {
+    assert_snapshot!(ENotation::char("#\\c"), @"#\\c");
+    assert_snapshot!(ENotation::char("#\\tab"), @"#\\tab");
+    assert_snapshot!(ENotation::char("#\\/"), @"#\\/");
+}
+
+#[test]
+fn parse_identifier() {
+    assert_snapshot!(ENotation::identifier("abc"), @"abc");
+    assert_snapshot!(ENotation::identifier("obscure-name-!$%^&*-_=+<.>/?"), @"obscure-name-!$%^&*-_=+<.>/?");
+    assert_snapshot!(ENotation::identifier("世界"), @"世界");
+    assert_snapshot!(ENotation::identifier("本好きの下剋上"), @"本好きの下剋上");
+}
+
+#[test]
+fn parse_string() {
+    assert_snapshot!(ENotation::string("\"abc\""), @"\"abc\"");
+}
 
 // #[test]
 // fn parse_list() {
 //     assert_snapshot!(ENotation::from_str("(1 2 3)"), @"(1 2 3)");
 //     // test nested case
 //     assert_snapshot!(ENotation::from_str("(1 (2 3))"), @"(1 (2 3))");
-// }
-
-// #[test]
-// fn parse_char() {
-//     assert_snapshot!(ENotation::from_str("#\\c"), @"#\\c");
-//     assert_snapshot!(ENotation::from_str("#\\tab"), @"#\\tab");
-//     assert_snapshot!(ENotation::from_str("#\\/"), @"#\\/");
-// }
-
-// #[test]
-// fn parse_identifier() {
-//     assert_snapshot!(ENotation::from_str("abc"), @"abc");
-//     assert_snapshot!(ENotation::from_str("obscure-name-!$%^&*-_=+<.>/?"), @"obscure-name-!$%^&*-_=+<.>/?");
-//     assert_snapshot!(ENotation::from_str("世界"), @"世界");
-//     assert_snapshot!(ENotation::from_str("本好きの下剋上"), @"本好きの下剋上");
-// }
-
-// #[test]
-// fn parse_string() {
-//     assert_snapshot!(ENotation::from_str("\"abc\""), @"\"abc\"");
 // }
 
 // #[test]
