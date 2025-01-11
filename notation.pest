@@ -54,8 +54,8 @@ SCHEME_ALPHA = _{
 identifier = @{ ALPHABETIC ~ (SCHEME_ALPHA*)? }
 
 // --------- list ---------------
-paren_list = _{ "(" ~ notation* ~ ")" }
-bracket_list = _{ "[" ~ notation* ~ "]" }
+paren_list = { "(" ~ notation* ~ ")" }
+bracket_list = { "[" ~ notation* ~ "]" }
 list = { paren_list | bracket_list }
 
 // --------- set ----------------
@@ -85,7 +85,7 @@ quasisyntax = { "#`" ~ notation }
 unsyntax = { "#," ~ notation }
 unsyntax_splicing = { "#,@" ~ notation }
 
-literal = _{
+literal = {
     boolean
   | char
   | float
@@ -95,28 +95,28 @@ literal = _{
   | identifier
 }
 
-container = _{
+container = {
   list
   | set
   | unamed_object
   | object
 }
 
-quoting = _{
+quoting = {
   quote
   | quasiquote
   | unquote
   | unquote_splicing
 }
 
-syntaxing = _{
+syntaxing = {
    syntax
   | quasisyntax
   | unsyntax
   | unsyntax_splicing
 }
 
-notation = _{
+notation = {
   literal
   | container
   | quoting
