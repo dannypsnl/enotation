@@ -89,13 +89,17 @@ pub struct Integer {
     pub value: i64,
 }
 
+fn parse_rational(input: Span) -> Result<(i64, i64), ()> {
+    let v = input.as_str().split('/').collect::<Vec<_>>();
+    let p: i64 = v[0].parse().map_err(|_| ())?;
+    let q: i64 = v[1].parse().map_err(|_| ())?;
+    Ok((p, q))
+}
 #[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::rational))]
 pub struct Rational {
-    #[pest_ast(outer(with(span_into_str), with(str::parse), with(Result::unwrap)))]
-    pub numerator: i64,
-    #[pest_ast(outer(with(span_into_str), with(str::parse), with(Result::unwrap)))]
-    pub denominator: i64,
+    #[pest_ast(outer(with(parse_rational), with(Result::unwrap)))]
+    pub value: (i64, i64),
 }
 
 #[derive(Debug, FromPest)]
@@ -210,12 +214,12 @@ impl Display for Float {
 }
 impl Display for Rational {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}/{}", self.denominator, self.numerator)
+        write!(f, "{}/{}", self.value.0, self.value.1)
     }
 }
 impl Display for String_ {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.value)
+        write!(f, "\"{}\"", self.value)
     }
 }
 impl Display for Identifier {
