@@ -1,4 +1,4 @@
-use std::fmt::Display;
+use std::{fmt::Display, rc::Rc};
 
 use pest::Span;
 use pest_ast::FromPest;
@@ -185,44 +185,74 @@ pub enum Container {
 }
 
 #[derive(Debug, FromPest)]
+#[pest_ast(rule(Rule::quote))]
+pub struct Quote {}
+#[derive(Debug, FromPest)]
+#[pest_ast(rule(Rule::quasiquote))]
+pub struct QuasiQuote {}
+#[derive(Debug, FromPest)]
+#[pest_ast(rule(Rule::unquote))]
+pub struct Unquote {}
+#[derive(Debug, FromPest)]
+#[pest_ast(rule(Rule::unquote_splicing))]
+pub struct UnquoteSplicing {}
+
+#[derive(Debug, FromPest)]
+#[pest_ast(rule(Rule::quoting))]
+pub enum Quoting {
+    Quote(Quote),
+    QuasiQuote(QuasiQuote),
+    Unquote(Unquote),
+    UnquoteSplicing(UnquoteSplicing),
+}
+
+#[derive(Debug, FromPest)]
+#[pest_ast(rule(Rule::syntax))]
+pub struct Syntax {}
+#[derive(Debug, FromPest)]
+#[pest_ast(rule(Rule::quasisyntax))]
+pub struct QuasiSyntax {}
+#[derive(Debug, FromPest)]
+#[pest_ast(rule(Rule::unsyntax))]
+pub struct Unsyntax {}
+#[derive(Debug, FromPest)]
+#[pest_ast(rule(Rule::unsyntax_splicing))]
+pub struct UnsyntaxSplicing {
+    pub value: Rc<ENotation>,
+}
+
+#[derive(Debug, FromPest)]
+#[pest_ast(rule(Rule::syntaxing))]
+pub enum Syntaxing {
+    Syntax(Syntax),
+    QuasiSyntax(QuasiSyntax),
+    Unsyntax(Unsyntax),
+    UnsyntaxSplicing(UnsyntaxSplicing),
+}
+
+#[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::notation))]
 pub enum ENotation {
     Literal(Literal),
     Container(Container),
+    Quoting(Quoting),
+    Syntaxing(Syntaxing),
 }
 
 impl Display for ENotation {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        use ENotation::*;
-        match self {
-            Literal(l) => write!(f, "{}", l),
-            Container(l) => write!(f, "{}", l),
-        }
+        write!(f, "{}", self)
     }
 }
 
 impl Display for Container {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Container::List(l) => write!(f, "{}", l),
-            Container::Set(l) => write!(f, "{}", l),
-            Container::UnamedObject(l) => write!(f, "{}", l),
-            Container::Object(l) => write!(f, "{}", l),
-        }
+        write!(f, "{}", self)
     }
 }
 impl Display for Literal {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        use Literal::*;
-        match self {
-            Boolean(b) => write!(f, "{}", b),
-            Integer(i) => write!(f, "{}", i),
-            Rational(r) => write!(f, "{}", r),
-            Float(a) => write!(f, "{}", a),
-            Char(c) => write!(f, "{}", c),
-            String_(s) => write!(f, "\"{}\"", s),
-            Identifier(x) => write!(f, "{}", x),
-        }
+        write!(f, "{}", self)
     }
 }
 

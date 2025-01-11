@@ -141,17 +141,3 @@ fn parse_comment() {
     //     .peek();
     // assert_debug_snapshot!(output, @"None");
 }
-
-// // #[test]
-// // fn parse_all() {
-// //     let results = parse_str(
-// //         "
-// // (a b c)
-
-// // (define x : i8 1)
-// // ",
-// //     )
-// //     .unwrap();
-
-// //     assert_debug_snapshot!(results);
-// // }
