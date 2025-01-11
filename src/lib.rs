@@ -186,16 +186,24 @@ pub enum Container {
 
 #[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::quote))]
-pub struct Quote {}
+pub struct Quote {
+    pub value: Box<ENotation>,
+}
 #[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::quasiquote))]
-pub struct QuasiQuote {}
+pub struct QuasiQuote {
+    pub value: Box<ENotation>,
+}
 #[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::unquote))]
-pub struct Unquote {}
+pub struct Unquote {
+    pub value: Box<ENotation>,
+}
 #[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::unquote_splicing))]
-pub struct UnquoteSplicing {}
+pub struct UnquoteSplicing {
+    pub value: Box<ENotation>,
+}
 
 #[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::quoting))]
@@ -208,13 +216,19 @@ pub enum Quoting {
 
 #[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::syntax))]
-pub struct Syntax {}
+pub struct Syntax {
+    pub value: Box<ENotation>,
+}
 #[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::quasisyntax))]
-pub struct QuasiSyntax {}
+pub struct QuasiSyntax {
+    pub value: Box<ENotation>,
+}
 #[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::unsyntax))]
-pub struct Unsyntax {}
+pub struct Unsyntax {
+    pub value: Box<ENotation>,
+}
 
 #[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::unsyntax_splicing))]
@@ -353,5 +367,45 @@ impl Display for String_ {
 impl Display for Identifier {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.name)
+    }
+}
+impl Display for Quote {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "'{}", self.value)
+    }
+}
+impl Display for QuasiQuote {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "`{}", self.value)
+    }
+}
+impl Display for Unquote {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, ",{}", self.value)
+    }
+}
+impl Display for UnquoteSplicing {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, ",@{}", self.value)
+    }
+}
+impl Display for Syntax {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "#'{}", self.value)
+    }
+}
+impl Display for QuasiSyntax {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "#`{}", self.value)
+    }
+}
+impl Display for Unsyntax {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "#,{}", self.value)
+    }
+}
+impl Display for UnsyntaxSplicing {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "#,@{}", self.value)
     }
 }

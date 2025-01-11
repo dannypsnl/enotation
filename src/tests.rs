@@ -44,6 +44,18 @@ impl ENotation {
         let mut output = ENotationParser::parse(Rule::notation, input).unwrap();
         List::from_pest(&mut output).unwrap()
     }
+    fn quote(input: &str) -> Quote {
+        let mut output = ENotationParser::parse(Rule::notation, input).unwrap();
+        Quote::from_pest(&mut output).unwrap()
+    }
+    fn quasiquote(input: &str) -> QuasiQuote {
+        let mut output = ENotationParser::parse(Rule::notation, input).unwrap();
+        QuasiQuote::from_pest(&mut output).unwrap()
+    }
+    fn syntax(input: &str) -> Syntax {
+        let mut output = ENotationParser::parse(Rule::notation, input).unwrap();
+        Syntax::from_pest(&mut output).unwrap()
+    }
 }
 
 #[test]
@@ -99,15 +111,15 @@ fn parse_list() {
     assert_snapshot!(ENotation::list("(1 (2 3))"), @"(1 (2 3))");
 }
 
-// #[test]
-// fn parse_quoting() {
-//     // quote
-//     assert_snapshot!(ENotation::from_str("'(1 2 3)"), @"'(1 2 3)");
-//     // quasiquote
-//     assert_snapshot!(ENotation::from_str("`(1 2 3)"), @"`(1 2 3)");
-//     // syntax
-//     assert_snapshot!(ENotation::from_str("#'(1 2 3)"), @"#'(1 2 3)");
-// }
+#[test]
+fn parse_quoting() {
+    // quote
+    assert_snapshot!(ENotation::quote("'(1 2 3)"), @"'(1 2 3)");
+    // quasiquote
+    assert_snapshot!(ENotation::quasiquote("`(1 2 3)"), @"`(1 2 3)");
+    // syntax
+    assert_snapshot!(ENotation::syntax("#'(1 2 3)"), @"#'(1 2 3)");
+}
 
 #[test]
 fn parse_set() {
