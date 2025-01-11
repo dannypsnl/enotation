@@ -147,15 +147,48 @@ pub enum Literal {
 }
 
 #[derive(Debug, FromPest)]
-#[pest_ast(rule(Rule::notation))]
-pub enum ENotation {
-    Literal(Literal),
-}
-
-#[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::list))]
 pub struct List {
     pub elems: Vec<ENotation>,
+}
+
+#[derive(Debug, FromPest)]
+#[pest_ast(rule(Rule::set))]
+pub struct Set {
+    pub elems: Vec<ENotation>,
+}
+#[derive(Debug, FromPest)]
+#[pest_ast(rule(Rule::unamed_object))]
+pub struct UnamedObject {
+    pub elems: Vec<ENotation>,
+}
+
+#[derive(Debug, FromPest)]
+#[pest_ast(rule(Rule::object_pair))]
+pub struct ObjectPair {
+    #[pest_ast(outer(with(parse_identifier), with(Result::unwrap)))]
+    pub key: String,
+    pub value: ENotation,
+}
+#[derive(Debug, FromPest)]
+#[pest_ast(rule(Rule::object))]
+pub struct Object {
+    pub elems: Vec<ObjectPair>,
+}
+#[derive(Debug, FromPest)]
+#[pest_ast(rule(Rule::container))]
+pub enum Container {
+    List(List),
+    Set(Set),
+    UnamedObject(UnamedObject),
+    Object(Object),
+}
+
+#[derive(Debug, FromPest)]
+#[pest_ast(rule(Rule::notation))]
+pub enum ENotation {
+    Literal(Literal),
+    Container(Container),
 }
 
 impl Display for ENotation {
@@ -163,10 +196,21 @@ impl Display for ENotation {
         use ENotation::*;
         match self {
             Literal(l) => write!(f, "{}", l),
+            Container(l) => write!(f, "{}", l),
         }
     }
 }
 
+impl Display for Container {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Container::List(l) => write!(f, "{}", l),
+            Container::Set(l) => write!(f, "{}", l),
+            Container::UnamedObject(l) => write!(f, "{}", l),
+            Container::Object(l) => write!(f, "{}", l),
+        }
+    }
+}
 impl Display for Literal {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         use Literal::*;
@@ -189,6 +233,59 @@ impl Display for Boolean {
         } else {
             write!(f, "#f")
         }
+    }
+}
+
+impl Display for Set {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "#{{")?;
+        for (i, v) in self.elems.iter().enumerate() {
+            if i == 0 {
+                write!(f, "{}", v)?;
+            } else {
+                write!(f, " {}", v)?;
+            }
+        }
+        write!(f, "}}")
+    }
+}
+impl Display for UnamedObject {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{{")?;
+        for (i, v) in self.elems.iter().enumerate() {
+            if i == 0 {
+                write!(f, "{}", v)?;
+            } else {
+                write!(f, ", {}", v)?;
+            }
+        }
+        write!(f, "}}")
+    }
+}
+impl Display for Object {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{{")?;
+        for (i, v) in self.elems.iter().enumerate() {
+            if i == 0 {
+                write!(f, "{}: {}", v.key, v.value)?;
+            } else {
+                write!(f, ", {}: {}", v.key, v.value)?;
+            }
+        }
+        write!(f, "}}")
+    }
+}
+impl Display for List {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "(")?;
+        for (i, v) in self.elems.iter().enumerate() {
+            if i == 0 {
+                write!(f, "{}", v)?;
+            } else {
+                write!(f, " {}", v)?;
+            }
+        }
+        write!(f, ")")
     }
 }
 impl Display for Char {

@@ -8,6 +8,14 @@ impl ENotation {
         let mut output = ENotationParser::parse(Rule::notation, input).unwrap();
         Boolean::from_pest(&mut output).unwrap()
     }
+    fn object(input: &str) -> Object {
+        let mut output = ENotationParser::parse(Rule::notation, input).unwrap();
+        Object::from_pest(&mut output).unwrap()
+    }
+    fn set(input: &str) -> Set {
+        let mut output = ENotationParser::parse(Rule::notation, input).unwrap();
+        Set::from_pest(&mut output).unwrap()
+    }
     fn integer(input: &str) -> Integer {
         let mut output = ENotationParser::parse(Rule::notation, input).unwrap();
         Integer::from_pest(&mut output).unwrap()
@@ -31,6 +39,10 @@ impl ENotation {
     fn string(input: &str) -> String_ {
         let mut output = ENotationParser::parse(Rule::notation, input).unwrap();
         String_::from_pest(&mut output).unwrap()
+    }
+    fn list(input: &str) -> List {
+        let mut output = ENotationParser::parse(Rule::notation, input).unwrap();
+        List::from_pest(&mut output).unwrap()
     }
 }
 
@@ -80,12 +92,12 @@ fn parse_string() {
     assert_snapshot!(ENotation::string("\"abc\""), @"\"abc\"");
 }
 
-// #[test]
-// fn parse_list() {
-//     assert_snapshot!(ENotation::from_str("(1 2 3)"), @"(1 2 3)");
-//     // test nested case
-//     assert_snapshot!(ENotation::from_str("(1 (2 3))"), @"(1 (2 3))");
-// }
+#[test]
+fn parse_list() {
+    assert_snapshot!(ENotation::list("(1 2 3)"), @"(1 2 3)");
+    // test nested case
+    assert_snapshot!(ENotation::list("(1 (2 3))"), @"(1 (2 3))");
+}
 
 // #[test]
 // fn parse_quoting() {
@@ -97,38 +109,38 @@ fn parse_string() {
 //     assert_snapshot!(ENotation::from_str("#'(1 2 3)"), @"#'(1 2 3)");
 // }
 
-// #[test]
-// fn parse_set() {
-//     // set
-//     assert_snapshot!(ENotation::from_str("#{1 2 3}"), @"#{1 2 3}");
-//     // empty set
-//     assert_snapshot!(ENotation::from_str("#{}"), @"#{}");
-// }
+#[test]
+fn parse_set() {
+    // set
+    assert_snapshot!(ENotation::set("#{1 2 3}"), @"#{1 2 3}");
+    // empty set
+    assert_snapshot!(ENotation::set("#{}"), @"#{}");
+}
 
-// #[test]
-// fn parse_object() {
-//     assert_snapshot!(ENotation::from_str("{a: 2, b: 3}"), @"{a: 2, b: 3}");
-//     // unnamed object
-//     assert_snapshot!(ENotation::from_str("{1, 2, 3}"), @"{1, 2, 3}");
-//     // empty object
-//     assert_snapshot!(ENotation::from_str("{}"), @"{}");
-// }
+#[test]
+fn parse_object() {
+    assert_snapshot!(ENotation::object("{a: 2, b: 3}"), @"{a: 2, b: 3}");
+    // unnamed object
+    assert_snapshot!(ENotation::object("{1, 2, 3}"), @"{1, 2, 3}");
+    // empty object
+    assert_snapshot!(ENotation::object("{}"), @"{}");
+}
 
-// #[test]
-// fn parse_comment() {
-//     let output = ENotationParser::parse(Rule::COMMENT, "; this is a comment")
-//         .unwrap()
-//         .peek();
-//     assert_debug_snapshot!(output, @"None");
+#[test]
+fn parse_comment() {
+    let output = ENotationParser::parse(Rule::COMMENT, "; this is a comment")
+        .unwrap()
+        .peek();
+    assert_debug_snapshot!(output, @"None");
 
-//     let output = ENotationParser::parse(Rule::COMMENT, "#;1").unwrap().peek();
-//     assert_debug_snapshot!(output, @"None");
+    let output = ENotationParser::parse(Rule::COMMENT, "#;1").unwrap().peek();
+    assert_debug_snapshot!(output, @"None");
 
-//     // let output = ENotationParser::parse(Rule::COMMENT, "#;(1 2 3)")
-//     //     .unwrap()
-//     //     .peek();
-//     // assert_debug_snapshot!(output, @"None");
-// }
+    // let output = ENotationParser::parse(Rule::COMMENT, "#;(1 2 3)")
+    //     .unwrap()
+    //     .peek();
+    // assert_debug_snapshot!(output, @"None");
+}
 
 // // #[test]
 // // fn parse_all() {
