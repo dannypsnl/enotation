@@ -1,6 +1,6 @@
 use std::{fmt::Display, rc::Rc};
 
-use pest::Span;
+use pest::{iterators::Pairs, Parser, RuleType, Span};
 use pest_ast::FromPest;
 use pest_derive::Parser;
 
@@ -215,10 +215,11 @@ pub struct QuasiSyntax {}
 #[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::unsyntax))]
 pub struct Unsyntax {}
+
 #[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::unsyntax_splicing))]
 pub struct UnsyntaxSplicing {
-    pub value: Rc<ENotation>,
+    pub value: Box<ENotation>,
 }
 
 #[derive(Debug, FromPest)]
@@ -241,18 +242,18 @@ pub enum ENotation {
 
 impl Display for ENotation {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self)
+        write!(f, "{:#?}", self)
     }
 }
 
 impl Display for Container {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self)
+        write!(f, "{:#?}", self)
     }
 }
 impl Display for Literal {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self)
+        write!(f, "{:#?}", self)
     }
 }
 
