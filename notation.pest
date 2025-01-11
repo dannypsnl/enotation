@@ -13,7 +13,7 @@ char_newline = @{ "#\\newline" }
 char_return = @{ "#\\return" }
 char_space = @{ "#\\space" }
 char_tab = @{ "#\\tab" }
-char = _{
+char = @{
   char_newline |
   char_return |
   char_space |

@@ -36,21 +36,20 @@ pub struct Boolean {
 }
 
 fn parse_char(input: Span) -> Result<char, ()> {
+    println!("hello {:?}", input);
     match input.as_str() {
         "#\\newline" => Ok('\n'),
         "#\\return" => Ok('\r'),
         "#\\space" => Ok(' '),
         "#\\tab" => Ok('\t'),
-        _ => {
-            let mut chars = input.as_str().chars();
+        i => {
+            let mut chars = i.chars();
             if chars.next() == Some('#') && chars.next() == Some('\\') {
-                match chars.next() {
-                    Some(c) => Ok(c),
-                    None => Err(()),
+                if let Some(c) = chars.next() {
+                    return Ok(c);
                 }
-            } else {
-                Err(())
             }
+            Err(())
         }
     }
 }
