@@ -5,9 +5,7 @@ single_notation_comment = _{ "#;" ~ notation }
 COMMENT = _{ single_line_comment | single_notation_comment }
 
 // --------- boolean ------------
-boolean_true  = @{ "#t" }
-boolean_false = @{ "#f" }
-boolean = _{ boolean_true | boolean_false }
+boolean = @{ "#t" | "#f" }
 
 // --------- char ---------------
 regular_char = @{ "#\\" ~ ANY }
@@ -102,20 +100,6 @@ literal = _{
   | identifier
 }
 
-quoting = _{
-  quote
-  | quasiquote
-  | unquote
-  | unquote_splicing
-}
-
-syntax_ = _{
-   syntax
-  | quasisyntax
-  | unsyntax
-  | unsyntax_splicing
-}
-
 container = _{
   list
   | set
@@ -123,9 +107,23 @@ container = _{
   | object
 }
 
+quoting = _{
+  quote
+  | quasiquote
+  | unquote
+  | unquote_splicing
+}
+
+syntaxing = _{
+   syntax
+  | quasisyntax
+  | unsyntax
+  | unsyntax_splicing
+}
+
 notation = _{
   literal
   | container
   | quoting
-  | syntax_
+  | syntaxing
 }

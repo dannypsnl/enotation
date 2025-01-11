@@ -6,11 +6,6 @@ use std::{fmt::Display, fs::File, io::Read, path::Path, rc::Rc};
 #[cfg(test)]
 mod tests;
 
-#[derive(Debug)]
-pub enum ReadError {
-    Io(std::io::Error),
-    Pest(pest::error::Error<Rule>),
-}
 impl From<pest::error::Error<Rule>> for ReadError {
     fn from(err: pest::error::Error<Rule>) -> Self {
         ReadError::Pest(err)
@@ -105,8 +100,6 @@ pub enum ENotationBody {
     Char(char),
     Str(String),
 
-
-    
     Identifier(String),
 
     // (a b c)

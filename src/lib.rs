@@ -1,19 +1,21 @@
-use from_pest::FromPest;
+use std::fmt::Display;
+
 use pest::Span;
 use pest_ast::FromPest;
 use pest_derive::Parser;
+
+#[cfg(test)]
+mod tests;
 
 #[derive(Parser)]
 #[grammar = "notation.pest"]
 pub struct ENotationParser;
 
-// #[derive(Debug, FromPest)]
-// #[pest_ast(rule(Rule::field))]
-// pub struct Field {
-//     #[pest_ast(outer(with(span_into_str), with(str::parse), with(Result::unwrap)))]
-//     pub value: f64,
-// }
-
+#[derive(Debug)]
+pub enum ReadError {
+    Io(std::io::Error),
+    Pest(pest::error::Error<Rule>),
+}
 
 fn span_into_str(span: Span) -> &str {
     span.as_str()
@@ -23,17 +25,15 @@ fn parse_bool(input: Span) -> Result<bool, ()> {
     match input.as_str() {
         "#t" => Ok(true),
         "#f" => Ok(false),
-        _ => Err(()),
+        _ => Ok(true),
     }
 }
-
 #[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::boolean))]
 pub struct Boolean {
     #[pest_ast(outer(with(parse_bool), with(Result::unwrap)))]
-    pub bool: bool,
+    pub value: bool,
 }
-
 
 fn parse_char(input: Span) -> Result<char, ()> {
     match input.as_str() {
@@ -62,11 +62,6 @@ pub struct Char {
     pub value: char,
 }
 
-
-// SIGN = { "+"|"-" }
-// dec_int = { ASCII_DIGIT ~ ("_"? ~ ASCII_DIGIT)* }
-// int = @{ SIGN? ~ dec_int }
-
 fn parse_int(input: Span) -> Result<i64, ()> {
     let mut chars = input.as_str().chars();
     let sign = match chars.next() {
@@ -90,38 +85,140 @@ fn parse_int(input: Span) -> Result<i64, ()> {
 
 #[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::int))]
-pub struct Int {
+pub struct Integer {
     #[pest_ast(outer(with(parse_int), with(Result::unwrap)))]
     pub value: i64,
 }
 
-
-// // --------- rational -----------
-// rational = @{ int ~ "/" ~ int }
-// // --------- float ---------------
-// float = @{
-//     int ~ "." ~ dec_int
-//   | SIGN? ~ "." ~ dec_int
-// }
-
-
 #[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::rational))]
 pub struct Rational {
-    pub numerator: Int,
-    pub denominator: Int,
+    pub numerator: Integer,
+    pub denominator: Integer,
 }
-
 
 #[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::float))]
 pub struct Float {
     #[pest_ast(outer(with(span_into_str), with(str::parse), with(Result::unwrap)))]
-    pub float: f64,
+    pub value: f64,
 }
 
+fn remove_quotes(s: &str) -> String {
+    s.trim_matches(|c| c == '\"' || c == '\'').to_string()
+}
+fn parse_string(input: Span) -> Result<String, ()> {
+    Ok(remove_quotes(input.as_str()))
+}
 
+#[derive(Debug, FromPest)]
+#[pest_ast(rule(Rule::string))]
+pub struct String_ {
+    #[pest_ast(outer(with(parse_string), with(Result::unwrap)))]
+    pub value: String,
+}
 
+fn parse_identifier(input: Span) -> Result<String, ()> {
+    Ok(input.as_str().to_string())
+}
 
-fn main() {
+#[derive(Debug, FromPest)]
+#[pest_ast(rule(Rule::identifier))]
+pub struct Identifier {
+    #[pest_ast(outer(with(parse_identifier), with(Result::unwrap)))]
+    pub name: String,
+}
+
+#[derive(Debug, FromPest)]
+#[pest_ast(rule(Rule::literal))]
+pub enum Literal {
+    Boolean(Boolean),
+    Char(Char),
+    Float(Float),
+    Rational(Rational),
+    Integer(Integer),
+    String_(String_),
+    Identifier(Identifier),
+}
+
+#[derive(Debug, FromPest)]
+#[pest_ast(rule(Rule::notation))]
+pub enum ENotation {
+    Literal(Literal),
+}
+
+#[derive(Debug, FromPest)]
+#[pest_ast(rule(Rule::list))]
+pub struct List {
+    pub elems: Vec<ENotation>,
+}
+
+impl Display for ENotation {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        use ENotation::*;
+        match self {
+            Literal(l) => write!(f, "{}", l),
+        }
+    }
+}
+
+impl Display for Literal {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        use Literal::*;
+        match self {
+            Boolean(b) => write!(f, "{}", b),
+            Integer(i) => write!(f, "{}", i),
+            Rational(r) => write!(f, "{}", r),
+            Float(a) => write!(f, "{}", a),
+            Char(c) => write!(f, "{}", c),
+            String_(s) => write!(f, "\"{}\"", s),
+            Identifier(x) => write!(f, "{}", x),
+        }
+    }
+}
+
+impl Display for Boolean {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if self.value {
+            write!(f, "#t")
+        } else {
+            write!(f, "#f")
+        }
+    }
+}
+impl Display for Char {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self.value {
+            ' ' => write!(f, "#\\space"),
+            '\t' => write!(f, "#\\tab"),
+            '\r' => write!(f, "#\\return"),
+            '\n' => write!(f, "#\\newline"),
+            c => write!(f, "#\\{}", c),
+        }
+    }
+}
+impl Display for Integer {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.value)
+    }
+}
+impl Display for Float {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.value)
+    }
+}
+impl Display for Rational {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}/{}", self.denominator, self.numerator)
+    }
+}
+impl Display for String_ {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.value)
+    }
+}
+impl Display for Identifier {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.name)
+    }
 }
