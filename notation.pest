@@ -8,17 +8,12 @@ COMMENT = _{ single_line_comment | single_notation_comment }
 boolean = @{ "#t" | "#f" }
 
 // --------- char ---------------
-regular_char = @{ "#\\" ~ ANY }
-char_newline = @{ "#\\newline" }
-char_return = @{ "#\\return" }
-char_space = @{ "#\\space" }
-char_tab = @{ "#\\tab" }
 char = @{
-  char_newline |
-  char_return |
-  char_space |
-  char_tab |
-  regular_char
+  "#\\newline" |
+  "#\\return" |
+  "#\\space" |
+  "#\\tab" |
+  "#\\" ~ ANY
 }
 
 // --------- integer ------------
