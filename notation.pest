@@ -1,6 +1,6 @@
 WHITESPACE = _{ " " | "\t" | "\n" }
 
-single_line_comment = _{ ";" ~ (!NEWLINE ~ ANY)* }
+single_line_comment = @{ ";" ~ (!NEWLINE ~ ANY)* }
 single_notation_comment = _{ "#;" ~ notation }
 COMMENT = _{ single_line_comment | single_notation_comment }
 
@@ -24,11 +24,11 @@ char = _{
 }
 
 // --------- integer ------------
-SIGN = { "+"|"-" }
-dec_int = { ASCII_DIGIT ~ ("_"? ~ ASCII_DIGIT)* }
+SIGN = @{ "+"|"-" }
+dec_int = @{ ASCII_DIGIT ~ ("_"? ~ ASCII_DIGIT)* }
 int = @{ SIGN? ~ dec_int }
 // --------- rational -----------
-rational = { int ~ "/" ~ int }
+rational = @{ int ~ "/" ~ int }
 // --------- float ---------------
 float = @{
     int ~ "." ~ dec_int
@@ -36,7 +36,7 @@ float = @{
 }
 
 // --------- string ----------
-string = { "\"" ~ ALPHABETIC* ~ "\"" }
+string = @{ "\"" ~ ALPHABETIC* ~ "\"" }
 
 // --------- identifier ----------
 SCHEME_ALPHA = _{
@@ -92,7 +92,7 @@ quasisyntax = { "#`" ~ notation }
 unsyntax = { "#," ~ notation }
 unsyntax_splicing = { "#,@" ~ notation }
 
-notation = _{
+literal = _{
     boolean
   | char
   | float
@@ -100,22 +100,32 @@ notation = _{
   | int
   | string
   | identifier
-  | list
-  | set
-  | unamed_object
-  | object
-  // quoting
-  | quote
+}
+
+quoting = _{
+  quote
   | quasiquote
   | unquote
   | unquote_splicing
-  // syntax
-  | syntax
+}
+
+syntax_ = _{
+   syntax
   | quasisyntax
   | unsyntax
   | unsyntax_splicing
 }
 
-file = {
-  SOI ~ notation* ~ EOI
+container = _{
+  list
+  | set
+  | unamed_object
+  | object
+}
+
+notation = _{
+  literal
+  | container
+  | quoting
+  | syntax_
 }
