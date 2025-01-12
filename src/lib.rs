@@ -38,7 +38,7 @@ pub struct ENotation {
 
 #[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::file))]
-struct EFile {
+pub struct EFile {
     pub notations: Vec<ENotation>,
     _eoi: EOI,
 }
