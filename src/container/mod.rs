@@ -1,3 +1,5 @@
+use crate::ENotation;
+
 #[cfg(test)]
 mod tests;
 
@@ -26,6 +28,15 @@ pub enum Container {
     Set(Set),
     UnamedObject(UnamedObject),
     Object(Object),
+}
+
+impl List {
+    pub fn elems(&self) -> &Vec<ENotation> {
+        match self {
+            List::PL(plist) => &plist.elems,
+            List::BL(blist) => &blist.elems,
+        }
+    }
 }
 
 impl Display for Container {

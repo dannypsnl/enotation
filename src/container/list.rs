@@ -23,15 +23,6 @@ pub enum List {
     BL(BList),
 }
 
-impl List {
-    pub fn elems(&self) -> &Vec<ENotation> {
-        match self {
-            List::PL(plist) => &plist.elems,
-            List::BL(blist) => &blist.elems,
-        }
-    }
-}
-
 impl Display for BList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "[")?;
