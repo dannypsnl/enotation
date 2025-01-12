@@ -20,6 +20,7 @@ fn all(input: &str) -> EFile {
 fn parse_random_notation_should_work() {
     assert_snapshot!(notation("1"), @"1");
     assert_snapshot!(notation("#f"), @"#f");
+    assert_snapshot!(notation("abc"), @"abc");
     assert_snapshot!(notation("#\\c"), @r"#\c");
     assert_snapshot!(notation("(1 (2 3))"), @"(1 (2 3))");
     assert_snapshot!(notation("({})"), @"({})");
