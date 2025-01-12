@@ -4,14 +4,14 @@ use pest_ast::FromPest;
 
 use crate::{literal::Identifier, ENotation, Rule};
 
-#[derive(Debug, FromPest)]
+#[derive(Debug, Clone, FromPest)]
 #[pest_ast(rule(Rule::object_pair))]
 pub struct ObjectPair {
     pub key: Identifier,
     pub value: ENotation,
 }
 
-#[derive(Debug, FromPest)]
+#[derive(Debug, Clone, FromPest)]
 #[pest_ast(rule(Rule::object))]
 pub struct Object {
     pub pairs: Vec<ObjectPair>,

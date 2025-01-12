@@ -21,7 +21,7 @@ use pest_ast::FromPest;
 
 use crate::Rule;
 
-#[derive(Debug, FromPest)]
+#[derive(Debug, Clone, FromPest)]
 #[pest_ast(rule(Rule::container))]
 pub enum Container {
     List(List),

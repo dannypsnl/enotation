@@ -5,7 +5,7 @@ use std::fmt::Display;
 #[cfg(test)]
 mod tests;
 
-#[derive(Debug, FromPest)]
+#[derive(Debug, Clone, FromPest)]
 #[pest_ast(rule(Rule::quoting))]
 pub enum Quoting {
     Quote(Quote),
@@ -14,22 +14,22 @@ pub enum Quoting {
     UnquoteSplicing(UnquoteSplicing),
 }
 
-#[derive(Debug, FromPest)]
+#[derive(Debug, Clone, FromPest)]
 #[pest_ast(rule(Rule::quote))]
 pub struct Quote {
     pub value: Box<ENotation>,
 }
-#[derive(Debug, FromPest)]
+#[derive(Debug, Clone, FromPest)]
 #[pest_ast(rule(Rule::quasiquote))]
 pub struct QuasiQuote {
     pub value: Box<ENotation>,
 }
-#[derive(Debug, FromPest)]
+#[derive(Debug, Clone, FromPest)]
 #[pest_ast(rule(Rule::unquote))]
 pub struct Unquote {
     pub value: Box<ENotation>,
 }
-#[derive(Debug, FromPest)]
+#[derive(Debug, Clone, FromPest)]
 #[pest_ast(rule(Rule::unquote_splicing))]
 pub struct UnquoteSplicing {
     pub value: Box<ENotation>,

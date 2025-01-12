@@ -19,7 +19,7 @@ mod tests;
 #[grammar = "notation.pest"]
 pub struct ENotationParser;
 
-#[derive(Debug, FromPest)]
+#[derive(Debug, Clone, FromPest)]
 #[pest_ast(rule(Rule::notation_))]
 pub enum ENotationBody {
     Literal(Literal),
@@ -28,7 +28,7 @@ pub enum ENotationBody {
     Syntaxing(Syntaxing),
 }
 
-#[derive(Debug, FromPest)]
+#[derive(Debug, Clone, FromPest)]
 #[pest_ast(rule(Rule::notation))]
 pub struct ENotation {
     #[pest_ast(outer(with(DiagnosticSpan::from_pest_span)))]
@@ -109,22 +109,5 @@ impl Display for ENotation {
             Quoting(q) => write!(f, "{}", q),
             Syntaxing(s) => write!(f, "{}", s),
         }
-    }
-}
-
-#[derive(Debug)]
-pub enum ReadError {
-    Io(std::io::Error),
-    Pest(pest::error::Error<Rule>),
-}
-
-impl From<pest::error::Error<Rule>> for ReadError {
-    fn from(err: pest::error::Error<Rule>) -> Self {
-        ReadError::Pest(err)
-    }
-}
-impl From<std::io::Error> for ReadError {
-    fn from(err: std::io::Error) -> Self {
-        ReadError::Io(err)
     }
 }

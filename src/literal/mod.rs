@@ -15,7 +15,7 @@ fn parse_bool(input: Span) -> Result<bool, ()> {
         _ => Ok(true),
     }
 }
-#[derive(Debug, FromPest)]
+#[derive(Debug, Clone, FromPest)]
 #[pest_ast(rule(Rule::boolean))]
 pub struct Boolean {
     #[pest_ast(outer(with(parse_bool), with(Result::unwrap)))]
@@ -41,7 +41,7 @@ fn parse_char(input: Span) -> Result<char, ()> {
     }
 }
 
-#[derive(Debug, FromPest)]
+#[derive(Debug, Clone, FromPest)]
 #[pest_ast(rule(Rule::char))]
 pub struct Char {
     #[pest_ast(outer(with(parse_char), with(Result::unwrap)))]
@@ -69,7 +69,7 @@ fn parse_int(input: Span) -> Result<i64, ()> {
     Ok(sign * value)
 }
 
-#[derive(Debug, FromPest)]
+#[derive(Debug, Clone, FromPest)]
 #[pest_ast(rule(Rule::int))]
 pub struct Integer {
     #[pest_ast(outer(with(parse_int), with(Result::unwrap)))]
@@ -82,7 +82,7 @@ fn parse_rational(input: Span) -> Result<(i64, i64), ()> {
     let q: i64 = v[1].parse().map_err(|_| ())?;
     Ok((p, q))
 }
-#[derive(Debug, FromPest)]
+#[derive(Debug, Clone, FromPest)]
 #[pest_ast(rule(Rule::rational))]
 pub struct Rational {
     #[pest_ast(outer(with(parse_rational), with(Result::unwrap)))]
@@ -93,7 +93,7 @@ fn span_into_str(span: Span) -> &str {
     span.as_str()
 }
 
-#[derive(Debug, FromPest)]
+#[derive(Debug, Clone, FromPest)]
 #[pest_ast(rule(Rule::float))]
 pub struct Float {
     #[pest_ast(outer(with(span_into_str), with(str::parse), with(Result::unwrap)))]
@@ -107,7 +107,7 @@ fn parse_string(input: Span) -> Result<String, ()> {
     Ok(remove_quotes(input.as_str()))
 }
 
-#[derive(Debug, FromPest)]
+#[derive(Debug, Clone, FromPest)]
 #[pest_ast(rule(Rule::string))]
 pub struct String_ {
     #[pest_ast(outer(with(parse_string), with(Result::unwrap)))]
@@ -122,14 +122,14 @@ fn parse_identifier(input: Span) -> Result<String, ()> {
     Ok(s.to_string())
 }
 
-#[derive(Debug, FromPest)]
+#[derive(Debug, Clone, FromPest)]
 #[pest_ast(rule(Rule::identifier))]
 pub struct Identifier {
     #[pest_ast(outer(with(parse_identifier), with(Result::unwrap)))]
     pub name: String,
 }
 
-#[derive(Debug, FromPest)]
+#[derive(Debug, Clone, FromPest)]
 #[pest_ast(rule(Rule::literal))]
 pub enum Literal {
     Boolean(Boolean),

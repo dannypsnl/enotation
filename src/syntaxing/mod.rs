@@ -5,29 +5,29 @@ use std::fmt::Display;
 #[cfg(test)]
 mod tests;
 
-#[derive(Debug, FromPest)]
+#[derive(Debug, Clone, FromPest)]
 #[pest_ast(rule(Rule::syntax))]
 pub struct Syntax {
     pub value: Box<ENotation>,
 }
-#[derive(Debug, FromPest)]
+#[derive(Debug, Clone, FromPest)]
 #[pest_ast(rule(Rule::quasisyntax))]
 pub struct QuasiSyntax {
     pub value: Box<ENotation>,
 }
-#[derive(Debug, FromPest)]
+#[derive(Debug, Clone, FromPest)]
 #[pest_ast(rule(Rule::unsyntax))]
 pub struct Unsyntax {
     pub value: Box<ENotation>,
 }
 
-#[derive(Debug, FromPest)]
+#[derive(Debug, Clone, FromPest)]
 #[pest_ast(rule(Rule::unsyntax_splicing))]
 pub struct UnsyntaxSplicing {
     pub value: Box<ENotation>,
 }
 
-#[derive(Debug, FromPest)]
+#[derive(Debug, Clone, FromPest)]
 #[pest_ast(rule(Rule::syntaxing))]
 pub enum Syntaxing {
     Syntax(Syntax),

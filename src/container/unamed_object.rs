@@ -4,7 +4,7 @@ use pest_ast::FromPest;
 
 use crate::{ENotation, Rule};
 
-#[derive(Debug, FromPest)]
+#[derive(Debug, Clone, FromPest)]
 #[pest_ast(rule(Rule::unamed_object))]
 pub struct UnamedObject {
     pub elems: Vec<ENotation>,

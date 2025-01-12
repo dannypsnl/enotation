@@ -4,19 +4,19 @@ use pest_ast::FromPest;
 
 use crate::{ENotation, Rule};
 
-#[derive(Debug, FromPest)]
+#[derive(Debug, Clone, FromPest)]
 #[pest_ast(rule(Rule::paren_list))]
 pub struct PList {
     pub elems: Vec<ENotation>,
 }
 
-#[derive(Debug, FromPest)]
+#[derive(Debug, Clone, FromPest)]
 #[pest_ast(rule(Rule::bracket_list))]
 pub struct BList {
     pub elems: Vec<ENotation>,
 }
 
-#[derive(Debug, FromPest)]
+#[derive(Debug, Clone, FromPest)]
 #[pest_ast(rule(Rule::list))]
 pub enum List {
     PL(PList),
