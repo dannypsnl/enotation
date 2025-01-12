@@ -18,12 +18,12 @@ fn object(input: &str) -> Object {
 
 #[test]
 fn parse_object_pair() {
-    assert_snapshot!(object_pair("a: 1"), @"a: 1");
+    assert_snapshot!(object_pair("a : 1"), @"a : 1");
 }
 
 #[test]
 fn parse_object() {
-    assert_snapshot!(object("{a: 1, b: 2, c: 3}"), @"{a: 1, b: 2, c: 3}");
+    assert_snapshot!(object("{a : 1, b : 2, c : 3}"), @"{a : 1, b : 2, c : 3}");
     // test nested case
-    assert_snapshot!(object("{a: 1, b: {c: 2, d: 3}}"), @"{a: 1, b: {c: 2, d: 3}}");
+    assert_snapshot!(object("{a : 1, b : {c : 2, d : 3}}"), @"{a : 1, b : {c : 2, d : 3}}");
 }

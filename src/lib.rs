@@ -36,6 +36,16 @@ pub struct ENotation {
     pub body: ENotationBody,
 }
 
+#[derive(Debug, FromPest)]
+#[pest_ast(rule(Rule::file))]
+struct EFile {
+    pub notations: Vec<ENotation>,
+    _eoi: EOI,
+}
+#[derive(Debug, FromPest)]
+#[pest_ast(rule(Rule::EOI))]
+struct EOI {}
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct DiagnosticSpan {
     pub start_line: usize,
@@ -82,6 +92,14 @@ impl DiagnosticSpan {
     }
 }
 
+impl Display for EFile {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        for e in &self.notations {
+            writeln!(f, "{}", e)?;
+        }
+        Ok(())
+    }
+}
 impl Display for ENotation {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         use ENotationBody::*;

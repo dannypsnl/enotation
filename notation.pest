@@ -32,26 +32,20 @@ float = @{
 string = @{ "\"" ~ ALPHABETIC* ~ "\"" }
 
 // --------- identifier ----------
-SCHEME_ALPHA = _{
-    ALPHABETIC
-  | "-"
-  | "!"
-  | "$"
-  | "%"
-  | "^"
-  | "&"
-  | "*"
-  | "-"
-  | "_"
-  | "="
-  | "+"
-  | "<"
-  | "."
-  | ">"
-  | "/"
-  | "?"
+SCHEME_START_ALPHA = _{
+  "#%"
+  | !(WHITE_SPACE | "(" | ")" | "[" | "]" | "{" | "}" | "," | "'" | "`" | ";" | "#" | "|" | "\\" | ".") ~ ANY
 }
-identifier = @{ ALPHABETIC ~ (SCHEME_ALPHA*)? }
+SCHEME_FOLLOW_ALPHA = _{
+  "#"
+  | "."
+  | SCHEME_START_ALPHA
+}
+identifier = @{
+  // quote identifier can accept anything
+  "|" ~ (!("|") ~ ANY)* ~ "|"
+  | SCHEME_START_ALPHA ~ (SCHEME_FOLLOW_ALPHA*)?
+}
 
 // --------- list ---------------
 paren_list = { "(" ~ notation* ~ ")" }
@@ -91,8 +85,8 @@ literal = {
   | float
   | rational
   | int
-  | string
   | identifier
+  | string
 }
 
 container = {
@@ -125,4 +119,4 @@ notation_ = {
 
 notation = { notation_ }
 
-file = { SOI ~ (notation ~ (WHITE_SPACE))* ~ EOI }
+file = { SOI ~ notation* ~ EOI }
