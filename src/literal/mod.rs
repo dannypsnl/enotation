@@ -3,7 +3,7 @@ use std::fmt::Display;
 use pest::Span;
 use pest_ast::FromPest;
 
-use crate::{span_into_str, Rule};
+use crate::Rule;
 
 #[cfg(test)]
 mod test;
@@ -87,6 +87,10 @@ fn parse_rational(input: Span) -> Result<(i64, i64), ()> {
 pub struct Rational {
     #[pest_ast(outer(with(parse_rational), with(Result::unwrap)))]
     pub value: (i64, i64),
+}
+
+fn span_into_str(span: Span) -> &str {
+    span.as_str()
 }
 
 #[derive(Debug, FromPest)]

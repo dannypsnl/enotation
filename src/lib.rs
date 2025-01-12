@@ -7,7 +7,6 @@ use std::fmt::Display;
 
 use container::Container;
 use literal::Literal;
-use pest::Span;
 use pest_ast::FromPest;
 use pest_derive::Parser;
 use quoting::Quoting;
@@ -16,19 +15,9 @@ use syntaxing::Syntaxing;
 #[cfg(test)]
 mod tests;
 
-fn span_into_str(span: Span) -> &str {
-    span.as_str()
-}
-
 #[derive(Parser)]
 #[grammar = "notation.pest"]
 pub struct ENotationParser;
-
-// #[derive(Debug)]
-// pub enum ReadError {
-//     Io(std::io::Error),
-//     Pest(pest::error::Error<Rule>),
-// }
 
 #[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::notation))]
@@ -47,5 +36,22 @@ impl Display for ENotation {
             ENotation::Quoting(q) => write!(f, "{}", q),
             ENotation::Syntaxing(s) => write!(f, "{}", s),
         }
+    }
+}
+
+#[derive(Debug)]
+pub enum ReadError {
+    Io(std::io::Error),
+    Pest(pest::error::Error<Rule>),
+}
+
+impl From<pest::error::Error<Rule>> for ReadError {
+    fn from(err: pest::error::Error<Rule>) -> Self {
+        ReadError::Pest(err)
+    }
+}
+impl From<std::io::Error> for ReadError {
+    fn from(err: std::io::Error) -> Self {
+        ReadError::Io(err)
     }
 }
