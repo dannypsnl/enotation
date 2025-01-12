@@ -78,6 +78,11 @@ fn parse_identifier() {
     assert_snapshot!(identifier("obscure-name-!$%^&*-_=+<.>/?"), @"obscure-name-!$%^&*-_=+<.>/?");
     assert_snapshot!(identifier("世界"), @"世界");
     assert_snapshot!(identifier("本好きの下剋上"), @"本好きの下剋上");
+
+    assert_snapshot!(identifier("a123"), @"a123");
+    assert_snapshot!(identifier("syntax-parse"), @"syntax-parse");
+    assert_snapshot!(identifier("λ"), @"λ");
+    assert_snapshot!(identifier("require"), @"require");
 }
 
 #[test]

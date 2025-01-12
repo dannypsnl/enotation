@@ -33,23 +33,24 @@ string = @{ "\"" ~ ALPHABETIC* ~ "\"" }
 
 // --------- identifier ----------
 SCHEME_ALPHA = _{
-    ALPHABETIC
-  | "-"
-  | "!"
-  | "$"
-  | "%"
-  | "^"
-  | "&"
-  | "*"
-  | "-"
-  | "_"
-  | "="
-  | "+"
-  | "<"
-  | "."
-  | ">"
-  | "/"
-  | "?"
+  ALPHABETIC |
+  "-" |
+  "!" |
+  "$" |
+  "%" |
+  "^" |
+  "&" |
+  "*" |
+  "-" |
+  "_" |
+  "=" |
+  "+" |
+  "<" |
+  "." |
+  ">" |
+  "/" |
+  "?" |
+  ":"
 }
 identifier = @{ ALPHABETIC ~ (SCHEME_ALPHA*)? }
 
@@ -88,11 +89,11 @@ unsyntax_splicing = { "#,@" ~ notation }
 literal = {
     boolean
   | char
+  | identifier
   | float
   | rational
   | int
   | string
-  | identifier
 }
 
 container = {
@@ -125,4 +126,4 @@ notation_ = {
 
 notation = { notation_ }
 
-file = { SOI ~ (notation ~ (WHITE_SPACE))* ~ EOI }
+file = { SOI ~ notation* ~ EOI }

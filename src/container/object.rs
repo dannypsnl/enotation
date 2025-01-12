@@ -19,7 +19,7 @@ pub struct Object {
 
 impl Display for ObjectPair {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}: {}", self.key, self.value)
+        write!(f, "{} : {}", self.key, self.value)
     }
 }
 

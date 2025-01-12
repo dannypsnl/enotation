@@ -92,6 +92,14 @@ impl DiagnosticSpan {
     }
 }
 
+impl Display for EFile {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        for e in &self.notations {
+            writeln!(f, "{}", e)?;
+        }
+        Ok(())
+    }
+}
 impl Display for ENotation {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         use ENotationBody::*;
