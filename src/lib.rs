@@ -11,6 +11,7 @@ use pest::Span;
 use pest_ast::FromPest;
 use pest_derive::Parser;
 use quoting::Quoting;
+use syntaxing::Syntaxing;
 
 #[cfg(test)]
 mod tests;
@@ -29,44 +30,13 @@ pub struct ENotationParser;
 //     Pest(pest::error::Error<Rule>),
 // }
 
-// #[derive(Debug, FromPest)]
-// #[pest_ast(rule(Rule::syntax))]
-// pub struct Syntax {
-//     pub value: Box<ENotation>,
-// }
-// #[derive(Debug, FromPest)]
-// #[pest_ast(rule(Rule::quasisyntax))]
-// pub struct QuasiSyntax {
-//     pub value: Box<ENotation>,
-// }
-// #[derive(Debug, FromPest)]
-// #[pest_ast(rule(Rule::unsyntax))]
-// pub struct Unsyntax {
-//     pub value: Box<ENotation>,
-// }
-
-// #[derive(Debug, FromPest)]
-// #[pest_ast(rule(Rule::unsyntax_splicing))]
-// pub struct UnsyntaxSplicing {
-//     pub value: Box<ENotation>,
-// }
-
-// #[derive(Debug, FromPest)]
-// #[pest_ast(rule(Rule::syntaxing))]
-// pub enum Syntaxing {
-//     Syntax(Syntax),
-//     QuasiSyntax(QuasiSyntax),
-//     Unsyntax(Unsyntax),
-//     UnsyntaxSplicing(UnsyntaxSplicing),
-// }
-
 #[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::notation))]
 pub enum ENotation {
     Literal(Literal),
     Container(Container),
     Quoting(Quoting),
-    // Syntaxing(Syntaxing),
+    Syntaxing(Syntaxing),
 }
 
 impl Display for ENotation {
@@ -75,28 +45,7 @@ impl Display for ENotation {
             ENotation::Literal(l) => write!(f, "{}", l),
             ENotation::Container(c) => write!(f, "{}", c),
             ENotation::Quoting(q) => write!(f, "{}", q),
-            // ENotation::Syntaxing(s) => write!(f, "{}", s),
+            ENotation::Syntaxing(s) => write!(f, "{}", s),
         }
     }
 }
-
-// impl Display for Syntax {
-//     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-//         write!(f, "#'{}", self.value)
-//     }
-// }
-// impl Display for QuasiSyntax {
-//     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-//         write!(f, "#`{}", self.value)
-//     }
-// }
-// impl Display for Unsyntax {
-//     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-//         write!(f, "#,{}", self.value)
-//     }
-// }
-// impl Display for UnsyntaxSplicing {
-//     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-//         write!(f, "#,@{}", self.value)
-//     }
-// }
