@@ -3,16 +3,16 @@ use crate::ENotation;
 #[cfg(test)]
 mod tests;
 
-mod list;
+pub mod list;
 use list::*;
 
-mod set;
+pub mod set;
 use set::*;
 
-mod unamed_object;
+pub mod unamed_object;
 use unamed_object::*;
 
-mod object;
+pub mod object;
 use object::*;
 
 use std::fmt::Display;
