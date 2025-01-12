@@ -9,7 +9,7 @@ fn notation(input: &str) -> ENotation {
     ENotation::from_pest(&mut output).unwrap()
 }
 fn all(input: &str) -> EFile {
-    let mut output = ENotationParser::parse(Rule::file, input).expect("????");
+    let mut output = ENotationParser::parse(Rule::file, input).unwrap();
     match EFile::from_pest(&mut output) {
         Ok(f) => return f,
         Err(err) => panic!("{}", err),
@@ -31,14 +31,18 @@ fn parse_all() {
     ; a list
     (1 2 3)
     "), @"(1 2 3)");
-    // assert_snapshot!(all("
-    // (define x : i32 1)
+    assert_snapshot!(all("
+    (define x : i32 1)
 
-    // (: f : int -> int)
-    // (define (f x)
-    //   (add1 x))
-    // "),
-    //       @"");
+    (: f : int -> int)
+    (define (f x)
+      (add1 x))
+    "),
+          @r"
+    (define x : i32 1)
+    (: f : int -> int)
+    (define (f x) (add1 x))
+    ");
 }
 
 #[test]

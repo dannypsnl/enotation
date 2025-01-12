@@ -58,6 +58,7 @@ fn parse_integer() {
 #[test]
 fn parse_rational() {
     assert_snapshot!(rational("1/2"), @"1/2");
+    assert_snapshot!(rational("-1/10"), @"-1/10");
 }
 
 #[test]
@@ -80,9 +81,15 @@ fn parse_identifier() {
     assert_snapshot!(identifier("本好きの下剋上"), @"本好きの下剋上");
 
     assert_snapshot!(identifier("a123"), @"a123");
+    assert_snapshot!(identifier("a-123"), @"a-123");
     assert_snapshot!(identifier("syntax-parse"), @"syntax-parse");
     assert_snapshot!(identifier("λ"), @"λ");
     assert_snapshot!(identifier("require"), @"require");
+    assert_snapshot!(identifier("😇"), @"😇");
+
+    assert_snapshot!(identifier("#%hello"), @"#%hello");
+    assert_snapshot!(identifier("ok#"), @"ok#");
+    assert_snapshot!(identifier("|6|"), @"#%hello");
 }
 
 #[test]
