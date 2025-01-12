@@ -36,6 +36,16 @@ pub struct ENotation {
     pub body: ENotationBody,
 }
 
+#[derive(Debug, FromPest)]
+#[pest_ast(rule(Rule::file))]
+struct EFile {
+    pub notations: Vec<ENotation>,
+    _eoi: EOI,
+}
+#[derive(Debug, FromPest)]
+#[pest_ast(rule(Rule::EOI))]
+struct EOI {}
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct DiagnosticSpan {
     pub start_line: usize,

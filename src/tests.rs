@@ -1,4 +1,4 @@
-use crate::{ENotation, ENotationParser, Rule};
+use crate::{EFile, ENotation, ENotationParser, Rule};
 use from_pest::FromPest;
 use pest::Parser;
 
@@ -8,6 +8,10 @@ fn notation(input: &str) -> ENotation {
     let mut output = ENotationParser::parse(Rule::notation, input).unwrap();
     ENotation::from_pest(&mut output).unwrap()
 }
+fn all(input: &str) -> EFile {
+    let mut output = ENotationParser::parse(Rule::notation, input).unwrap();
+    EFile::from_pest(&mut output).unwrap()
+}
 
 #[test]
 fn parse_random_notation_should_work() {
@@ -16,6 +20,12 @@ fn parse_random_notation_should_work() {
     assert_snapshot!(notation("#\\c"), @r"#\c");
     assert_snapshot!(notation("(1 (2 3))"), @"(1 (2 3))");
     assert_snapshot!(notation("({})"), @"({})");
+}
+
+#[test]
+fn parse_all() {
+    let f = all("(1 2 3)");
+    assert_debug_snapshot!(f.notations, @"");
 }
 
 #[test]
