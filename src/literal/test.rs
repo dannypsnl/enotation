@@ -4,7 +4,7 @@ use pest::Parser;
 use crate::{ENotationParser, Rule};
 
 use super::*;
-use insta::assert_snapshot;
+use insta::{assert_debug_snapshot, assert_snapshot};
 
 fn boolean(input: &str) -> Boolean {
     let mut output = ENotationParser::parse(Rule::boolean, input).unwrap();
@@ -88,8 +88,25 @@ fn parse_identifier() {
     assert_snapshot!(identifier("😇"), @"😇");
 
     assert_snapshot!(identifier("#%hello"), @"#%hello");
+    assert_snapshot!(identifier("5a"), @"5a");
     assert_snapshot!(identifier("ok#"), @"ok#");
-    assert_snapshot!(identifier("|6|"), @"#%hello");
+    assert_snapshot!(identifier("|6|"), @"|6|");
+    assert_snapshot!(identifier("|one, two|"), @"|one, two|");
+}
+
+#[test]
+fn invalid_identifier() {
+    assert_debug_snapshot!(ENotationParser::parse(Rule::identifier, ".").is_err(), @"true");
+    assert_debug_snapshot!(ENotationParser::parse(Rule::identifier, "#abc").is_err(), @"true");
+    assert_debug_snapshot!(ENotationParser::parse(Rule::identifier, "{}").is_err(), @"true");
+    assert_debug_snapshot!(ENotationParser::parse(Rule::identifier, "`").is_err(), @"true");
+}
+
+#[test]
+#[should_panic]
+fn invalid_identifier_that_an_integer() {
+    let mut output = ENotationParser::parse(Rule::identifier, "789").unwrap();
+    Identifier::from_pest(&mut output).unwrap();
 }
 
 #[test]

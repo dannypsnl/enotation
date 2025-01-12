@@ -115,7 +115,11 @@ pub struct String_ {
 }
 
 fn parse_identifier(input: Span) -> Result<String, ()> {
-    Ok(input.as_str().to_string())
+    let s = input.as_str();
+    if s.parse::<i64>().is_ok() {
+        return Err(());
+    }
+    Ok(s.to_string())
 }
 
 #[derive(Debug, FromPest)]

@@ -34,15 +34,16 @@ string = @{ "\"" ~ ALPHABETIC* ~ "\"" }
 // --------- identifier ----------
 SCHEME_START_ALPHA = _{
   "#%"
-  | !(WHITE_SPACE | "(" | ")" | "[" | "]" | "{" | "}" | "," | "'" | "`" | ";" | "#" | "|" | "\\") ~ ANY
+  | !(WHITE_SPACE | "(" | ")" | "[" | "]" | "{" | "}" | "," | "'" | "`" | ";" | "#" | "|" | "\\" | ".") ~ ANY
 }
 SCHEME_FOLLOW_ALPHA = _{
   "#"
+  | "."
   | SCHEME_START_ALPHA
 }
 identifier = @{
   // quote identifier can accept anything
-  "|" ~ ANY* ~ "|"
+  "|" ~ (!("|") ~ ANY)* ~ "|"
   | SCHEME_START_ALPHA ~ (SCHEME_FOLLOW_ALPHA*)?
 }
 
@@ -81,10 +82,10 @@ unsyntax_splicing = { "#,@" ~ notation }
 literal = {
     boolean
   | char
-  | identifier
   | float
   | rational
   | int
+  | identifier
   | string
 }
 
