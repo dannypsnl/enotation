@@ -116,9 +116,11 @@ syntaxing = {
   | unsyntax_splicing
 }
 
-notation = {
+notation_ = {
   literal
   | container
   | quoting
   | syntaxing
 }
+
+notation = { notation_ }
