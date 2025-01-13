@@ -1,4 +1,4 @@
-use crate::{ENotation, Rule};
+use crate::{ENotation, Rule, SetDebugFileName};
 use pest_ast::FromPest;
 use std::fmt::Display;
 
@@ -14,25 +14,63 @@ pub enum Quoting {
     UnquoteSplicing(UnquoteSplicing),
 }
 
+impl SetDebugFileName for Quoting {
+    fn set_debug_file_name(&mut self, file_name: &str) {
+        match self {
+            Quoting::Quote(quote) => quote.set_debug_file_name(file_name),
+            Quoting::QuasiQuote(quasi_quote) => quasi_quote.set_debug_file_name(file_name),
+            Quoting::Unquote(unquote) => unquote.set_debug_file_name(file_name),
+            Quoting::UnquoteSplicing(unquote_splicing) => unquote_splicing.set_debug_file_name(file_name),
+        }
+    }
+}
+
 #[derive(Debug, Clone, FromPest)]
 #[pest_ast(rule(Rule::quote))]
 pub struct Quote {
     pub value: Box<ENotation>,
 }
+
+impl SetDebugFileName for Quote {
+    fn set_debug_file_name(&mut self, file_name: &str) {
+        self.value.set_debug_file_name(file_name);
+    }
+}
+
 #[derive(Debug, Clone, FromPest)]
 #[pest_ast(rule(Rule::quasiquote))]
 pub struct QuasiQuote {
     pub value: Box<ENotation>,
 }
+
+impl SetDebugFileName for QuasiQuote {
+    fn set_debug_file_name(&mut self, file_name: &str) {
+        self.value.set_debug_file_name(file_name);
+    }
+}
+
 #[derive(Debug, Clone, FromPest)]
 #[pest_ast(rule(Rule::unquote))]
 pub struct Unquote {
     pub value: Box<ENotation>,
 }
+
+impl SetDebugFileName for Unquote {
+    fn set_debug_file_name(&mut self, file_name: &str) {
+        self.value.set_debug_file_name(file_name);
+    }
+}
+
 #[derive(Debug, Clone, FromPest)]
 #[pest_ast(rule(Rule::unquote_splicing))]
 pub struct UnquoteSplicing {
     pub value: Box<ENotation>,
+}
+
+impl SetDebugFileName for UnquoteSplicing {
+    fn set_debug_file_name(&mut self, file_name: &str) {
+        self.value.set_debug_file_name(file_name);
+    }
 }
 
 impl Display for Quoting {

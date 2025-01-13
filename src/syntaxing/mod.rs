@@ -1,4 +1,4 @@
-use crate::{ENotation, Rule};
+use crate::{container::set::Set, ENotation, Rule, SetDebugFileName};
 use pest_ast::FromPest;
 use std::fmt::Display;
 
@@ -10,21 +10,47 @@ mod tests;
 pub struct Syntax {
     pub value: Box<ENotation>,
 }
+
+impl SetDebugFileName for Syntax {
+    fn set_debug_file_name(&mut self, file_name: &str) {
+        self.value.set_debug_file_name(file_name);
+    }
+}
+
 #[derive(Debug, Clone, FromPest)]
 #[pest_ast(rule(Rule::quasisyntax))]
 pub struct QuasiSyntax {
     pub value: Box<ENotation>,
 }
+
+impl SetDebugFileName for QuasiSyntax {
+    fn set_debug_file_name(&mut self, file_name: &str) {
+        self.value.set_debug_file_name(file_name);
+    }
+}
+
 #[derive(Debug, Clone, FromPest)]
 #[pest_ast(rule(Rule::unsyntax))]
 pub struct Unsyntax {
     pub value: Box<ENotation>,
 }
 
+impl SetDebugFileName for Unsyntax {
+    fn set_debug_file_name(&mut self, file_name: &str) {
+        self.value.set_debug_file_name(file_name);
+    }
+}
+
 #[derive(Debug, Clone, FromPest)]
 #[pest_ast(rule(Rule::unsyntax_splicing))]
 pub struct UnsyntaxSplicing {
     pub value: Box<ENotation>,
+}
+
+impl SetDebugFileName for UnsyntaxSplicing {
+    fn set_debug_file_name(&mut self, file_name: &str) {
+        self.value.set_debug_file_name(file_name);
+    }
 }
 
 #[derive(Debug, Clone, FromPest)]
@@ -34,6 +60,17 @@ pub enum Syntaxing {
     QuasiSyntax(QuasiSyntax),
     Unsyntax(Unsyntax),
     UnsyntaxSplicing(UnsyntaxSplicing),
+}
+
+impl SetDebugFileName for Syntaxing {
+    fn set_debug_file_name(&mut self, file_name: &str) {
+        match self {
+            Syntaxing::Syntax(syntax) => syntax.set_debug_file_name(file_name),
+            Syntaxing::QuasiSyntax(quasi_syntax) => quasi_syntax.set_debug_file_name(file_name),
+            Syntaxing::Unsyntax(unsyntax) => unsyntax.set_debug_file_name(file_name),
+            Syntaxing::UnsyntaxSplicing(unsyntax_splicing) => unsyntax_splicing.set_debug_file_name(file_name),
+        }
+    }
 }
 
 impl Display for Syntaxing {

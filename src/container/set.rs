@@ -2,12 +2,20 @@ use std::fmt::Display;
 
 use pest_ast::FromPest;
 
-use crate::{ENotation, Rule};
+use crate::{ENotation, Rule, SetDebugFileName};
 
 #[derive(Debug, Clone, FromPest)]
 #[pest_ast(rule(Rule::set))]
 pub struct Set {
     pub elems: Vec<ENotation>,
+}
+
+impl SetDebugFileName for Set {
+    fn set_debug_file_name(&mut self, file_name: &str) {
+        for elem in self.elems.iter_mut() {
+            elem.set_debug_file_name(file_name);
+        }
+    }
 }
 
 impl Display for Set {

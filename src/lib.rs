@@ -16,6 +16,12 @@ use syntaxing::Syntaxing;
 #[cfg(test)]
 mod tests;
 
+
+pub trait SetDebugFileName {
+    fn set_debug_file_name(&mut self, file_name: &str);
+}
+
+
 #[derive(Parser)]
 #[grammar = "notation.pest"]
 pub struct ENotationParser;
@@ -29,6 +35,17 @@ pub enum ENotationBody {
     Syntaxing(Syntaxing),
 }
 
+impl SetDebugFileName for ENotationBody {
+    fn set_debug_file_name(&mut self, file_name: &str) {
+        match self {
+            ENotationBody::Container(c) => c.set_debug_file_name(file_name),
+            ENotationBody::Quoting(q) => q.set_debug_file_name(file_name),
+            ENotationBody::Syntaxing(s) => s.set_debug_file_name(file_name),
+            _ => {}
+        }
+    }
+}
+
 #[derive(Debug, Clone, FromPest)]
 #[pest_ast(rule(Rule::notation))]
 pub struct ENotation {
@@ -37,17 +54,34 @@ pub struct ENotation {
     pub body: ENotationBody,
 }
 
+impl SetDebugFileName for ENotation {
+    fn set_debug_file_name(&mut self, file_name: &str) {
+        self.span.file = Some(file_name.to_string());
+        self.body.set_debug_file_name(file_name);
+    }
+}
+
 #[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::file))]
 pub struct EFile {
     pub notations: Vec<ENotation>,
-    _eoi: EOI,
+    _eoi: Eoi,
 }
+
+impl SetDebugFileName for EFile {
+    fn set_debug_file_name(&mut self, file_name: &str) {
+        for e in self.notations.iter_mut() {
+            e.set_debug_file_name(file_name);
+        }
+    }
+}
+
 #[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::EOI))]
-struct EOI {}
+struct Eoi {}
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default)]
 pub struct DiagnosticSpan {
     pub start_line: usize,
     pub start_col: usize,
@@ -58,21 +92,9 @@ pub struct DiagnosticSpan {
     pub end_offset: usize,
 
     pub span: String,
+    pub file: Option<String>,
 }
 
-impl Default for DiagnosticSpan {
-    fn default() -> Self {
-        Self {
-            start_line: 0,
-            start_col: 0,
-            start_offset: 0,
-            end_line: 0,
-            end_col: 0,
-            end_offset: 0,
-            span: String::new(),
-        }
-    }
-}
 
 impl DiagnosticSpan {
     pub fn from_pest_span(span: pest::Span<'_>) -> Self {
@@ -89,6 +111,7 @@ impl DiagnosticSpan {
             end_col,
             end_offset,
             span: source,
+            file: None,
         }
     }
 }

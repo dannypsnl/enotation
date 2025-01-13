@@ -1,4 +1,4 @@
-use crate::ENotation;
+use crate::{ENotation, SetDebugFileName};
 
 #[cfg(test)]
 mod tests;
@@ -28,6 +28,17 @@ pub enum Container {
     Set(Set),
     UnamedObject(UnamedObject),
     Object(Object),
+}
+
+impl SetDebugFileName for Container {
+    fn set_debug_file_name(&mut self, file_name: &str) {
+        match self {
+            Container::List(l) => l.set_debug_file_name(file_name),
+            Container::Set(s) => s.set_debug_file_name(file_name),
+            Container::UnamedObject(uo) => uo.set_debug_file_name(file_name),
+            Container::Object(o) => o.set_debug_file_name(file_name),
+        }
+    }
 }
 
 impl List {
