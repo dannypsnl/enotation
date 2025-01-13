@@ -10,6 +10,7 @@ use literal::Literal;
 use pest_ast::FromPest;
 use pest_derive::Parser;
 use quoting::Quoting;
+use serde::{Deserialize, Serialize};
 use syntaxing::Syntaxing;
 
 #[cfg(test)]
@@ -46,7 +47,7 @@ pub struct EFile {
 #[pest_ast(rule(Rule::EOI))]
 struct EOI {}
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct DiagnosticSpan {
     pub start_line: usize,
     pub start_col: usize,
