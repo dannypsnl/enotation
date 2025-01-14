@@ -100,6 +100,8 @@ fn invalid_identifier() {
     assert_debug_snapshot!(ENotationParser::parse(Rule::identifier, "#abc").is_err(), @"true");
     assert_debug_snapshot!(ENotationParser::parse(Rule::identifier, "{}").is_err(), @"true");
     assert_debug_snapshot!(ENotationParser::parse(Rule::identifier, "`").is_err(), @"true");
+    // string should fail
+    assert_debug_snapshot!(ENotationParser::parse(Rule::identifier, r#""abc""#).is_err(), @"true");
 }
 
 #[test]
