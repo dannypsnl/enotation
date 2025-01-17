@@ -1,4 +1,4 @@
-use crate::{container::set::Set, ENotation, Rule, SetDebugFileName};
+use crate::{ENotation, Rule, SetDebugFileName};
 use pest_ast::FromPest;
 use std::fmt::Display;
 
@@ -68,7 +68,9 @@ impl SetDebugFileName for Syntaxing {
             Syntaxing::Syntax(syntax) => syntax.set_debug_file_name(file_name),
             Syntaxing::QuasiSyntax(quasi_syntax) => quasi_syntax.set_debug_file_name(file_name),
             Syntaxing::Unsyntax(unsyntax) => unsyntax.set_debug_file_name(file_name),
-            Syntaxing::UnsyntaxSplicing(unsyntax_splicing) => unsyntax_splicing.set_debug_file_name(file_name),
+            Syntaxing::UnsyntaxSplicing(unsyntax_splicing) => {
+                unsyntax_splicing.set_debug_file_name(file_name)
+            }
         }
     }
 }

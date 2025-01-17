@@ -9,8 +9,8 @@ use list::*;
 pub mod set;
 use set::*;
 
-pub mod unamed_object;
-use unamed_object::*;
+pub mod vector;
+use vector::*;
 
 pub mod object;
 use object::*;
@@ -25,8 +25,8 @@ use crate::Rule;
 #[pest_ast(rule(Rule::container))]
 pub enum Container {
     List(List),
+    Vector(Vector),
     Set(Set),
-    UnamedObject(UnamedObject),
     Object(Object),
 }
 
@@ -34,13 +34,21 @@ impl SetDebugFileName for Container {
     fn set_debug_file_name(&mut self, file_name: &str) {
         match self {
             Container::List(l) => l.set_debug_file_name(file_name),
+            Container::Vector(v) => v.set_debug_file_name(file_name),
             Container::Set(s) => s.set_debug_file_name(file_name),
-            Container::UnamedObject(uo) => uo.set_debug_file_name(file_name),
             Container::Object(o) => o.set_debug_file_name(file_name),
         }
     }
 }
 
+impl Vector {
+    pub fn elems(&self) -> &Vec<ENotation> {
+        match self {
+            Vector::PV(pvector) => &pvector.elems,
+            Vector::BV(bvector) => &bvector.elems,
+        }
+    }
+}
 impl List {
     pub fn elems(&self) -> &Vec<ENotation> {
         match self {
@@ -54,8 +62,8 @@ impl Display for Container {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Container::List(l) => write!(f, "{}", l),
+            Container::Vector(v) => write!(f, "{}", v),
             Container::Set(s) => write!(f, "{}", s),
-            Container::UnamedObject(uo) => write!(f, "{}", uo),
             Container::Object(o) => write!(f, "{}", o),
         }
     }

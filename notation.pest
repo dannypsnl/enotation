@@ -52,6 +52,11 @@ paren_list = { "(" ~ notation* ~ ")" }
 bracket_list = { "[" ~ notation* ~ "]" }
 list = { paren_list | bracket_list }
 
+// --------- vector -------------
+paren_vector = { "#(" ~ notation* ~ ")" }
+bracket_vector = { "#[" ~ notation* ~ "]" }
+vector = { paren_vector | bracket_vector }
+
 // --------- set ----------------
 set = { "#{" ~ notation* ~ "}" }
 
@@ -59,10 +64,6 @@ set = { "#{" ~ notation* ~ "}" }
 object = {
   "{" ~ "}" |
   "{" ~ object_pair ~ ("," ~ object_pair)* ~ ","? ~ "}"
-}
-unamed_object = {
-  "{" ~ "}" |
-  "{" ~ notation ~ ("," ~ notation)* ~ ","? ~ "}"
 }
 object_pair = {
   identifier ~ ":" ~ notation
@@ -91,8 +92,8 @@ literal = {
 
 container = {
   list
+  | vector
   | set
-  | unamed_object
   | object
 }
 
